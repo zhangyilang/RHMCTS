@@ -4,11 +4,10 @@ from pisqpipe import DEBUG_EVAL, DEBUG
 import algorithm
 
 
-pp.infotext = 'name="pbrain-pyrandom", author="Jan Stransky", version="1.0", country="Czech Republic", www="https://github.com/stranskyjan/pbrain-pyrandom"'
+pp.infotext = 'name="HMCTS", author="ElenZhang", version="1.0", country="China", www="https://github.com/zhangyilang/mdpwithmcts"'
 
 MAX_BOARD = 100
 board = [[0 for i in range(MAX_BOARD)] for j in range(MAX_BOARD)]
-
 
 def brain_init():
     if pp.width < 5 or pp.height < 5:
@@ -17,6 +16,8 @@ def brain_init():
     if pp.width > MAX_BOARD or pp.height > MAX_BOARD:
         pp.pipeOut("ERROR Maximal board size is {}".format(MAX_BOARD))
         return
+    global board
+    board = [[0 for i in range(pp.width)] for j in range(pp.height)]
     pp.pipeOut("OK")
 
 
@@ -73,13 +74,12 @@ def brain_turn():
     #         break
     # if i > 1:
     #     pp.pipeOut("DEBUG {} coordinates didn't hit an empty field".format(i))
-    move, status = algorithm.getaction(board, 1)
-    x, y = move
+    (x, y), status = algorithm.getaction(board, 1)
     pp.do_mymove(x, y)
 
 
 def brain_end():
-    pass
+    pp.pipeOut('Brain ends.')
 
 
 def brain_about():
@@ -102,26 +102,29 @@ if DEBUG_EVAL:
 # A possible way how to debug brains.
 # To test it, just "uncomment" it (delete enclosing """)
 ######################################################################
-
+'''
 # define a file for logging ...
 DEBUG_LOGFILE = "tmp/pbrain-pyrandom.log"
 # ...and clear it initially
-with open(DEBUG_LOGFILE,"w") as f:
+with open(DEBUG_LOGFILE, "w") as f:
     pass
+
 
 # define a function for writing messages to the file
 def logDebug(msg):
-    with open(DEBUG_LOGFILE,"a") as f:
+    with open(DEBUG_LOGFILE, "a") as f:
         f.write(msg+"\n")
         f.flush()
+
 
 # define a function to get exception traceback
 def logTraceBack():
     import traceback
-    with open(DEBUG_LOGFILE,"a") as f:
+    with open(DEBUG_LOGFILE, "a") as f:
         traceback.print_exc(file=f)
         f.flush()
-    raise
+    raise Exception("Brain_turn Error!")
+
 
 # use logDebug wherever
 # use try-except (with logTraceBack in except branch) to get exception info
@@ -134,8 +137,9 @@ def brain_turn():
         logDebug("some message 3") # not logged, as it is after error
     except:
         logTraceBack()
-
+'''
 ######################################################################
+
 
 # "overwrites" functions in pisqpipe module
 pp.brain_init = brain_init

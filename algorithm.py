@@ -7,10 +7,11 @@ def lookaround(board, n):
     actions = set()
     for x in range(0, len(board)):
         for y in range(0, len(board)):
-            for i in range(max(x-n, 0), min(x+n, len(board))):
-                for j in range(max(y-n, 0), min(y+n, len(board))):
-                    if board[i][j] == 0:
-                        actions.add((i, j))
+            if board[x][y] != 0:
+                for i in range(max(x-n, 0), min(x+n, len(board))):
+                    for j in range(max(y-n, 0), min(y+n, len(board))):
+                        if board[i][j] == 0:
+                            actions.add((i, j))
     return actions
 
 
@@ -83,7 +84,6 @@ def getaction(state, player):
     # 可以改进的地方：
     # 1. 如果某一步棋有多重效果（如一三一四、既给自己制造机会又封锁对面的机会等），可以增大其被选中的几率
     # 2. lookaround代替随机选(已改)
-    boardLength = len(state)
     opponent = 2 if player == 1 else 1
     actions = heuristic(state, player, 4)
     if len(actions) != 0:
@@ -97,7 +97,7 @@ def getaction(state, player):
     actions = heuristic(state, opponent, 3)
     if len(actions) != 0:
         return random.choice(actions), 'U'
-    empty = list(lookaround(board, 2))
+    empty = list(lookaround(state, 2))
     if len(empty) == 0:
         return (-1, -1), 'D'                # draw
     return random.choice(empty), 'U'
@@ -155,9 +155,10 @@ def adpwithmcts(board, ratio, simuTimes):
 
 
 # test
-MAX_BOARD = 20
-board = [[0 for i in range(MAX_BOARD)] for j in range(MAX_BOARD)]
-board[1][3] = 2
-board[3][1] = 2
-board[2][2] = 1
-move, status = getaction(board, 1)
+if __name__ == "__main__":
+    MAX_BOARD = 20
+    board = [[0 for i in range(MAX_BOARD)] for j in range(MAX_BOARD)]
+    board[5][5] = 2
+    board[6][5] = 2
+    board[8][5] = 2
+    print(getaction(board, 1))
