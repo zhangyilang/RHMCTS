@@ -1,5 +1,45 @@
+import numpy as np
 import random
 import copy
+
+
+class TreeNode(object):
+    '''
+        A node in the MCTS tree.
+        Each node keeps track of its own value Q, prior probability P, and
+        its visit-count-adjusted prior score U.
+    '''
+    def __init__(self, parent, prior_P):
+        self.parent = parent
+        self.P = prior_P    # prior probability
+        self.children = dict()
+        self.visits = 0     # number of visits
+        self.Q = 0          # evaluated value (exploitation)
+        self.U = 0          # visit-count-adjusted prior score (exploration)
+
+    def select(self, c_puct):
+        return max(self.children.items(), key=lambda x: x[1].get_value(c_puct))
+
+    def expand(self, action_prob):
+        for action, prob in action_prob:
+            if action not in self.children:
+                self.children[action] = TreeNode(self, prob)
+
+    def update_recursive(self, leaf_value):
+        if self.parent:
+            self.parent.update_recursive(-leaf_value)
+        self.visits += 1
+        self.Q += (leaf_value - self.Q) / self.visits   # running average
+
+    def get_value(self, c_puct):
+        self.U = (c_puct * self.P * np.sqrt(self.parent.visits) / (1 + self.visits))
+        return self.Q + self.U
+
+    def is_leaf(self):
+        return len(self.children) == 0
+
+    def is_root(self):
+        return self.parent is None
 
 
 def lookaround(board, n):
