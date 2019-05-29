@@ -27,7 +27,7 @@ class TreeNode(object):
 
     def update_recursive(self, leaf_value):
         if self.parent:
-            self.parent.update_recursive(-leaf_value)
+            self.parent.update_recursive(leaf_value)
         self.visits += 1
         self.Q += (leaf_value - self.Q) / self.visits   # running average
 
