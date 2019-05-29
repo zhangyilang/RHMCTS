@@ -1,4 +1,4 @@
-import numpy as np
+import math
 import random
 import copy
 
@@ -14,13 +14,15 @@ class TreeNode(object):
         self.P = prior_P    # prior probability
         self.children = dict()
         self.visits = 0     # number of visits
-        self.Q = 0          # evaluated value (exploitation)
+        self.Q = 0          # Q-value (exploitation)
         self.U = 0          # visit-count-adjusted prior score (exploration)
 
     def select(self, c_puct):
+        # selection stage
         return max(self.children.items(), key=lambda x: x[1].get_value(c_puct))
 
     def expand(self, action_prob):
+        # expansion stage
         for action, prob in action_prob:
             if action not in self.children:
                 self.children[action] = TreeNode(self, prob)
@@ -32,7 +34,7 @@ class TreeNode(object):
         self.Q += (leaf_value - self.Q) / self.visits   # running average
 
     def get_value(self, c_puct):
-        self.U = (c_puct * self.P * np.sqrt(self.parent.visits) / (1 + self.visits))
+        self.U = (c_puct * self.P * math.sqrt(self.parent.visits) / (1 + self.visits))
         return self.Q + self.U
 
     def is_leaf(self):
@@ -40,6 +42,23 @@ class TreeNode(object):
 
     def is_root(self):
         return self.parent is None
+
+
+class HMCTS(object):
+    def __init__(self, policy_value_fn, c_puct=5, n_playout=10000):
+        """
+        policy_value_fn: a function that takes in a board state and outputs
+            a list of (action, probability) tuples and also a score in [-1, 1]
+            (i.e. the expected value of the end game score from the current
+            player's perspective) for the current player.
+        c_puct: a number in (0, inf) that controls how quickly exploration
+            converges to the maximum-value policy. A higher value means
+            relying on the prior more.
+        """
+        self._root = TreeNode(None, 1.0)
+        self._policy = policy_value_fn
+        self._c_puct = c_puct
+        self._n_playout = n_playout
 
 
 def lookaround(board, n):

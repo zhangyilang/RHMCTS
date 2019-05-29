@@ -1,7 +1,6 @@
 import random
 import pisqpipe as pp
 from pisqpipe import DEBUG_EVAL, DEBUG
-import numpy as np
 import algorithm
 
 
@@ -19,7 +18,7 @@ def brain_init():
         pp.pipeOut("ERROR Maximal board size is {}".format(MAX_BOARD))
         return
     global board
-    board = np.asarray([[0 for i in range(pp.width)] for j in range(pp.height)])
+    board = [[0 for i in range(pp.width)] for j in range(pp.height)]
     pp.pipeOut("OK")
 
 
