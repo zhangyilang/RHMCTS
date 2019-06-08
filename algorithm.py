@@ -29,7 +29,7 @@ class TreeNode(object):
 
     def update_recursive(self, leaf_value):
         if self.parent:
-            self.parent.update_recursive(leaf_value)
+            self.parent.update_recursive(-leaf_value)
         self.visits += 1
         self.Q += (leaf_value - self.Q) / self.visits   # running average
 
@@ -45,7 +45,7 @@ class TreeNode(object):
 
 
 class HMCTS(object):
-    def __init__(self, policy_value_fn, c_puct=5, n_playout=10000):
+    def __init__(self, policy_value_fn, c_puct=5, num_simu=10000):
         """
         policy_value_fn: a function that takes in a board state and outputs
             a list of (action, probability) tuples and also a score in [-1, 1]
@@ -54,11 +54,71 @@ class HMCTS(object):
         c_puct: a number in (0, inf) that controls how quickly exploration
             converges to the maximum-value policy. A higher value means
             relying on the prior more.
+        num: number of simulations.
         """
-        self._root = TreeNode(None, 1.0)
-        self._policy = policy_value_fn
-        self._c_puct = c_puct
-        self._n_playout = n_playout
+        self.root = TreeNode(None, 1.0)
+        self.policy = policy_value_fn
+        self.c_puct = c_puct
+        self.num_simu = num_simu
+
+    def simulate(self, state):
+        board, player = state
+        node = self.root
+        while not node.is_leaf():
+            (action_x, action_y), node = node.select(self.c_puct)
+            board[action_x][action_y] = player
+
+            action_prob = self.policy(state)    # 改用Heuristic
+            end = self.isTerminal(board, action_x, action_y)
+            if end is False:
+                node.expand(action_prob)
+            elif end is True:
+                leaf_value = 1. if player == 1 else -1.
+                node.update_recursive(leaf_value)
+            else:   # end == -1 (tie)
+                leaf_value = 0.
+                node.update_recursive(leaf_value)
+
+    def isTerminal(self, board, x, y):
+        boardLength = len(board)
+        player = board[x][y]
+        # column
+        d_start = max(-1 * x, -4)
+        d_end = min(boardLength - x - 5, 0)
+        for d in range(d_start, d_end + 1):
+            pieces = [board[x + d + k][y] for k in range(5)]
+            if pieces == [player] * 5:
+                return True
+        # row
+        d_start = max(-1 * y, -4)
+        d_end = min(boardLength - y - 5, 0)
+        for d in range(d_start, d_end + 1):
+            if board[x][y + d:y + d + 5] == [player] * 5:
+                return True
+        # positive diagonal
+        d_start = max(-1 * x, -1 * y, -4)
+        d_end = min(boardLength - x - 5, boardLength - y - 5, 0)
+        for d in range(d_start, d_end + 1):
+            pieces = [board[x + d + k][y + d + k] for k in range(5)]
+            if pieces == [player] * 5:
+                return True
+        # oblique diagonal
+        d_start = max(-1 * x, y - boardLength + 1, -4)
+        d_end = min(boardLength - x - 5, y - 5, 0)
+        for d in range(d_start, d_end + 1):
+            pieces = [board[x + d + k][y - d - k] for k in range(5)]
+            if pieces == [player] * 5:
+                return True
+        # tie (-1) or not terminal (False)
+        for row in board:
+            if 0 in row:
+                return False
+        return -1
+
+    def get_action_prob(self, state, tmp=1e-3):
+        for n in range(self.num_simu):
+            state_copy = copy.deepcopy(state)
+            self.simulate(state_copy)
 
 
 def lookaround(board, n):
@@ -74,37 +134,6 @@ def lookaround(board, n):
     return actions
 
 
-def isTerminal(state, x, y):
-    boardLength = len(state)
-    player = state[x][y]
-    # column
-    d_start = max(-1*x, -4)
-    d_end = min(boardLength-x-5, 0)
-    for d in range(d_start, d_end+1):
-        pieces = [state[x+d+k][y] for k in range(5)]
-        if pieces == [player] * 5:
-            return True
-    # row
-    d_start = max(-1*y, -4)
-    d_end = min(boardLength-y-5, 0)
-    for d in range(d_start, d_end+1):
-        if state[x][y+d:y+d+5] == [player] * 5:
-            return True
-    # positive diagonal
-    d_start = max(-1*x, -1*y, -4)
-    d_end = min(boardLength-x-5, boardLength-y-5, 0)
-    for d in range(d_start, d_end+1):
-        pieces = [state[x+d+k][y+d+k] for k in range(5)]
-        if pieces == [player] * 5:
-            return True
-    # oblique diagonal
-    d_start = max(-1*x, y-boardLength+1, -4)
-    d_end = min(boardLength-x-5, y-5, 0)
-    for d in range(d_start, d_end+1):
-        pieces = [state[x+d+k][y-d-k] for k in range(5)]
-        if pieces == [player] * 5:
-            return True
-    return False
 
 
 def heuristic(state, player, number):
