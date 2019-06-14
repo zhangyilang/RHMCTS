@@ -8,6 +8,7 @@ pp.infotext = 'name="HMCTS", author="ElenZhang", version="1.0", country="China",
 
 MAX_BOARD = 100
 board = [[0 for i in range(MAX_BOARD)] for j in range(MAX_BOARD)]
+player = algorithm.RHMCTSPlayer()
 
 
 def brain_init():
@@ -64,18 +65,18 @@ def brain_takeback(x, y):
 def brain_turn():
     if pp.terminateAI:
        return
-    i = 0
-    while True:
-        x = random.randint(0, pp.width)
-        y = random.randint(0, pp.height)
-        i += 1
-        if pp.terminateAI:
-            return
-        if isFree(x, y):
-            break
-    if i > 1:
-        pp.pipeOut("DEBUG {} coordinates didn't hit an empty field".format(i))
-    # (x, y), status = algorithm.getaction(board, 1)
+    # i = 0
+    # while True:
+    #     x = random.randint(0, pp.width)
+    #     y = random.randint(0, pp.height)
+    #     i += 1
+    #     if pp.terminateAI:
+    #         return
+    #     if isFree(x, y):
+    #         break
+    # if i > 1:
+    #     pp.pipeOut("DEBUG {} coordinates didn't hit an empty field".format(i))
+    (x, y) = player.get_action(board)
     pp.do_mymove(x, y)
 
 

@@ -44,7 +44,7 @@ class TreeNode(object):
         return self.parent is None
 
 
-class HMCTS(object):
+class RHMCTS(object):
     def __init__(self, policy_value_fn, c_puct=1, num_simu=10000):
         """
         :param policy_value_fn: a function that takes in a board state and outputs
@@ -97,7 +97,7 @@ class HMCTS(object):
         else:  # end == -1 (tie)
             node.update_recursive(0.)
 
-    def simulate(self, state, limit_depth=100):
+    def simulate(self, state, limit_depth=20):
         # simulation stage
         board, player = state
         for depth in range(limit_depth):
@@ -144,6 +144,20 @@ class HMCTS(object):
         return -1
 
     def get_action(self, board):
+
+        actions = heuristic(board, 1, 4)
+        if len(actions) != 0:
+            return choice(actions)
+        actions = heuristic(board, 1, 4)
+        if len(actions) != 0:
+            return choice(actions)
+        actions = heuristic(board, 1, 3)
+        if len(actions) != 0:
+            return choice(actions)
+        actions = heuristic(board, 1, 3)
+        if len(actions) != 0:
+            return choice(actions)
+
         for n in range(self.num_simu):
             state_copy = deepcopy((board, 1))  # 1 for we player 1
             self.playout(state_copy)
@@ -157,16 +171,22 @@ class HMCTS(object):
             self.root = TreeNode(None, 1.0)
 
 
-class HMCTSPlayer(object):
-    def __init__(self, policy_evaluation_fn=policy_evaluation_function, c_puct=5, num_simu=2000):
-        self.hmcts = HMCTS(policy_evaluation_fn, c_puct, num_simu)
+class RHMCTSPlayer(object):
+    # def __init__(self, policy_evaluation_fn=policy_evaluation_function, c_puct=5, num_simu=100):
+    def __init__(self, policy_evaluation_fn=coarse_policy_eva_fn, c_puct=1, num_simu=50):
+        self.rhmcts = RHMCTS(policy_evaluation_fn, c_puct, num_simu)
 
     def get_action(self, board):
-        action = self.hmcts.get_action(board)
-        self.hmcts.update_with_move(-1)     # 改进：向下走两步，重复利用模拟结果
+        action = self.rhmcts.get_action(board)
+        self.rhmcts.update_with_move(-1)     # 改进：向下走两步，重复利用模拟结果
         return action
 
 
 # test
-if __name__ == "__main__":
-    pass
+# if __name__ == "__main__":
+#     test_board = [[0 for i in range(20)] for j in range(20)]
+#     test_board[1][5] = 1
+#     test_board[2][4] = 1
+#     test_board[3][3] = 1
+#     player1 = RHMCTSPlayer()
+#     print(player1.get_action(test_board))

@@ -14,7 +14,7 @@ Algorithm: Restricted Heuristic Monte Carlo Tree Search.
 
 ##### 1. Selection
 
-Start from the root node (each node is a Q-state for current player), search along the highest U value (adjusted UCB value to keep a balance between exploration and exploitation) until a leaf node.
+Start from the root node, search along the highest U value (adjusted UCB value to keep a balance between exploration and exploitation) until a leaf node.
 
 -  If this leaf node is a termination node, do **backpropagation** with leaf value of 1 (for winning) or 0 (for tie).
 -  If this leaf node is not a termination node, do **expansion**.

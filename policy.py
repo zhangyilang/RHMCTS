@@ -1,4 +1,4 @@
-from random import choice
+from random import choice, sample
 
 
 heuristic4_p1 = {(1, 1, 1, 1, 0): 4, (1, 1, 1, 0, 1): 3, (1, 1, 0, 1, 1): 2, (1, 0, 1, 1, 1): 1, (0, 1, 1, 1, 1): 0}
@@ -23,7 +23,26 @@ def policy_evaluation_function(state):
 
 
 def simulation_evaluation_function(state):
+    '''
+    Simplified version of policy_evaluation function. Return more possible actions without probability.
+    :param state: [board, player]
+    :return: [(x0, y0), (x1, y1), ... , (xn, yn)]
+    '''
+    board, player = state
     pass
+
+
+def coarse_policy_eva_fn(state):
+    board, player = state
+    actions = [(x, y) for x in range(len(board)) for y in range(len(board)) if board[x][y] == 0]
+    act_prob = [(act, 1/len(actions)) for act in actions]
+    return sample(act_prob, 5)
+
+
+def coarse_simu_eva_fn(state):
+    board, player = state
+    actions = [(x, y) for x in range(len(board)) for y in range(len(board)) if board[x][y] == 0]
+    return actions
 
 
 def simulation_policy(state):
@@ -46,7 +65,8 @@ def simulation_policy(state):
     if len(actions) != 0:
         return choice(actions)
 
-    actions = simulation_evaluation_function(state)
+    # actions = simulation_evaluation_function(state)
+    actions = coarse_simu_eva_fn(state)
     return choice(actions)
 
 
@@ -85,11 +105,3 @@ def heuristic(board, player, number):
                 d = h[player][pieces]
                 heuristicActions.append((x + d, y - d))
     return heuristicActions
-
-
-if __name__ == "__main__":
-    test_board = [[0 for i in range(20)] for j in range(20)]
-    test_board[1][5] = 1
-    test_board[2][4] = 1
-    test_board[3][3] = 1
-    print(heuristic(test_board, 1, 3))
