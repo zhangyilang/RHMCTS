@@ -1,6 +1,6 @@
 import math
-import random
 import copy
+from policy import *
 
 
 class TreeNode(object):
@@ -11,7 +11,7 @@ class TreeNode(object):
     '''
     def __init__(self, parent, prior_P):
         self.parent = parent
-        self.P = prior_P    # prior probability
+        self.P = prior_P    # prior probability for winning
         self.children = dict()
         self.visits = 0     # number of visits
         self.Q = 0          # Q-value (exploitation)
@@ -45,43 +45,53 @@ class TreeNode(object):
 
 
 class HMCTS(object):
-    def __init__(self, policy_value_fn, c_puct=5, num_simu=10000):
+    def __init__(self, policy_value_fn, c_puct=1, num_simu=10000):
         """
-        policy_value_fn: a function that takes in a board state and outputs
+        :param policy_value_fn: a function that takes in a board state and outputs
             a list of (action, probability) tuples and also a score in [-1, 1]
             (i.e. the expected value of the end game score from the current
             player's perspective) for the current player.
-        c_puct: a number in (0, inf) that controls how quickly exploration
+        :param c_puct: a number in (0, inf) that controls how quickly exploration
             converges to the maximum-value policy. A higher value means
             relying on the prior more.
-        num: number of simulations.
+        :param num_simu: number of simulations.
         """
         self.root = TreeNode(None, 1.0)
         self.policy = policy_value_fn
         self.c_puct = c_puct
         self.num_simu = num_simu
 
-    def simulate(self, state):
+    def playout(self, state):
         board, player = state
         node = self.root
+
+        # selection: find out the leaf node to be expand
         while not node.is_leaf():
             (action_x, action_y), node = node.select(self.c_puct)
             board[action_x][action_y] = player
+            player = 1 if player == 2 else 2    # switch player
 
-            action_prob = self.policy(state)    # 改用Heuristic
-            end = self.isTerminal(board, action_x, action_y)
-            if end is False:
-                node.expand(action_prob)
-            elif end is True:
-                leaf_value = 1. if player == 1 else -1.
-                node.update_recursive(leaf_value)
-            else:   # end == -1 (tie)
-                leaf_value = 0.
-                node.update_recursive(leaf_value)
+        end = self.isTerminal(board, action_x, action_y, player)
+        if end is False:
+            current_state = (board, player)
+            # expansion: expand the best n substates.
+            node.expand(self.policy(current_state))
+            # simulation
+            leaf_value = self.simulate(current_state)
+        elif end is True:
+            leaf_value = 1.
+        else:  # end == -1 (tie)
+            leaf_value = 0.
 
-    def isTerminal(self, board, x, y):
+        # backpropagation
+        node.update_recursive(leaf_value)
+
+    def simulate(self, state, limit_depth=100):
+        # simulation stage
+        pass
+
+    def isTerminal(self, board, x, y, player):
         boardLength = len(board)
-        player = board[x][y]
         # column
         d_start = max(-1 * x, -4)
         d_end = min(boardLength - x - 5, 0)
@@ -115,138 +125,30 @@ class HMCTS(object):
                 return False
         return -1
 
-    def get_action_prob(self, state, tmp=1e-3):
+    def get_action(self, board):
         for n in range(self.num_simu):
-            state_copy = copy.deepcopy(state)
-            self.simulate(state_copy)
+            state_copy = copy.deepcopy((board, 1))  # 1 for we player 1
+            self.playout(state_copy)
+        return max(self.root.children.items(), key=lambda x: x[1].Q)[0]
 
-
-def lookaround(board, n):
-    # look around for n grids
-    actions = set()
-    for x in range(0, len(board)):
-        for y in range(0, len(board)):
-            if board[x][y] != 0:
-                for i in range(max(x-n, 0), min(x+n, len(board))):
-                    for j in range(max(y-n, 0), min(y+n, len(board))):
-                        if board[i][j] == 0:
-                            actions.add((i, j))
-    return actions
-
-
-
-
-def heuristic(state, player, number):
-    # Heuristic Knowledge
-    boardLength = len(state)
-    opponent = 2 if player == 1 else 1
-    heuristicActions = []
-    # column
-    for x in range(boardLength-4):
-        for y in range(boardLength):
-            pieces = [state[x+d][y] for d in range(5)]
-            if pieces.count(player) == number and opponent not in pieces:
-                heuristicActions += [(x+d, y) for d in range(5) if state[x+d][y] == 0]
-    # row
-    for x in range(boardLength):
-        for y in range(boardLength-4):
-            pieces = [state[x][y+d] for d in range(5)]
-            if pieces.count(player) == number and opponent not in pieces:
-                heuristicActions += [(x, y+d) for d in range(5) if state[x][y+d] == 0]
-    # positive diagonal
-    for x in range(boardLength-4):
-        for y in range(boardLength-4):
-            pieces = [state[x+d][y+d] for d in range(5)]
-            if pieces.count(player) == number and opponent not in pieces:
-                heuristicActions += [(x+d, y+d) for d in range(5) if state[x+d][y+d] == 0]
-    # oblique diagonal
-    for x in range(boardLength - 4):
-        for y in range(4, boardLength):
-            pieces = [state[x+d][y-d] for d in range(5)]
-            if pieces.count(player) == number and opponent not in pieces:
-                heuristicActions += [(x+d, y-d) for d in range(5) if state[x+d][y-d] == 0]
-    return heuristicActions
-
-
-def getaction(state, player):
-    # 可以改进的地方：
-    # 1. 如果某一步棋有多重效果（如一三一四、既给自己制造机会又封锁对面的机会等），可以增大其被选中的几率
-    # 2. lookaround代替随机选(已改)
-    opponent = 2 if player == 1 else 1
-    actions = heuristic(state, player, 4)
-    if len(actions) != 0:
-        return random.choice(actions), 'W'  # win
-    actions = heuristic(state, opponent, 4)
-    if len(actions) != 0:
-        return random.choice(actions), 'U'  # unknown
-    actions = heuristic(state, player, 3)
-    if len(actions) != 0:
-        return random.choice(actions), 'U'
-    actions = heuristic(state, opponent, 3)
-    if len(actions) != 0:
-        return random.choice(actions), 'U'
-    empty = list(lookaround(state, 2))
-    if len(empty) == 0:
-        return (-1, -1), 'D'                # draw
-    return random.choice(empty), 'U'
-
-
-def simulation(state, player):
-    (x, y), status = getaction(state, player)
-    if status == 'W':
-        return 1 if player == 1 else 0
-    if status == 'D':
-        return 0.5
-    state[x][y] = player
-    player = 2 if player == 1 else 1    # change player
-    return simulation(state, player)
-
-
-def HMCTS(moves, board, simuTimes):
-    probabilities = []
-    for x, y in moves:
-        reward = 0
-        board[x][y] = 1
-        if isTerminal(board, x, y):
-            reward = simuTimes
+    def update_with_move(self, last_move):
+        # Step forward in the tree, keeping everything we already know about the subtree.
+        if last_move in self.root.children:
+            self.root = self.root.children[last_move]
         else:
-            for i in range(simuTimes):
-                board_new = copy.deepcopy(board)
-                reward += simulation(board_new, 2)
-        board[x][y] = 0
-        probabilities.append(reward/simuTimes)
-    return probabilities
+            self.root = TreeNode(None, 1.0)
 
 
-def ADP(board):
-    pass
+class HMCTSPlayer(object):
+    def __init__(self, policy_evaluation_fn=policy_evaluation_function, c_puct=5, num_simu=2000):
+        self.hmcts = HMCTS(policy_evaluation_fn, c_puct, num_simu)
 
-
-def adpwithmcts(board, ratio, simuTimes):
-    '''
-    implement ADP with MCTS
-    :param board: 2-d list for the gomoku board, board[i][j] == 0 for empty, 1 for my move, 2 for opponents's move
-    :param ratio: parameter lambda to adjust the ratio between ADP and MCTS
-    :param simuTimes: simulation times of MCTS
-    :return: the action to take
-    '''
-    M_ADP, W_ADP = ADP(board)   # M is moves and W is corresponding winning probability
-    W_MCTS = HMCTS(M_ADP, board, simuTimes)
-    max_p = 0
-    action = None
-    for i in range(len(W_ADP)):
-        p = ratio * W_ADP[i] + (1 - ratio) * W_MCTS[i]
-        if p > max_p:
-            max_p = p
-            action = M_ADP[i]
-    return action
+    def get_action(self, board):
+        action = self.hmcts.get_action(board)
+        self.hmcts.update_with_move(-1)     # 改进：向下走两步，重复利用模拟结果
+        return action
 
 
 # test
 if __name__ == "__main__":
-    MAX_BOARD = 20
-    board = [[0 for i in range(MAX_BOARD)] for j in range(MAX_BOARD)]
-    board[5][5] = 2
-    board[6][5] = 2
-    board[8][5] = 2
-    print(getaction(board, 1))
+    pass
