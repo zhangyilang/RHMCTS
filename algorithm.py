@@ -1,5 +1,5 @@
 import math
-import copy
+from copy import deepcopy
 from policy import *
 
 
@@ -66,29 +66,47 @@ class HMCTS(object):
         node = self.root
 
         # selection: find out the leaf node to be expand
+        end = False
         while not node.is_leaf():
             (action_x, action_y), node = node.select(self.c_puct)
             board[action_x][action_y] = player
             player = 1 if player == 2 else 2    # switch player
+            end = self.isTerminal(board, action_x, action_y, player)
 
-        end = self.isTerminal(board, action_x, action_y, player)
         if end is False:
-            current_state = (board, player)
             # expansion: expand the best n substates.
-            node.expand(self.policy(current_state))
+            action_prob = self.policy((board, player))
+            node.expand(action_prob)
             # simulation
-            leaf_value = self.simulate(current_state)
-        elif end is True:
-            leaf_value = 1.
-        else:  # end == -1 (tie)
-            leaf_value = 0.
+            opponent = 1 if player == 2 else 2    # switch player
+            for act, _ in action_prob:
+                new_board = deepcopy(board)
+                new_board[act[0]][act[1]] = player
+                winner = self.simulate((new_board, opponent))
+                # backpropagation
+                if winner == player:
+                    leaf_value = 1
+                elif winner == opponent:
+                    leaf_value = -1
+                else:
+                    leaf_value = 0
+                node.children[act].update_recursive(leaf_value)
 
-        # backpropagation
-        node.update_recursive(leaf_value)
+        elif end is True:
+            node.update_recursive(1.)
+        else:  # end == -1 (tie)
+            node.update_recursive(0.)
 
     def simulate(self, state, limit_depth=100):
         # simulation stage
-        pass
+        board, player = state
+        for depth in range(limit_depth):
+            x, y = simulation_policy((board, player))
+            board[x][y] = player
+            end = self.isTerminal(board, x, y, player)
+            if end is True:
+                return player
+            player = 1 if player == 2 else 2  # switch player
 
     def isTerminal(self, board, x, y, player):
         boardLength = len(board)
@@ -127,7 +145,7 @@ class HMCTS(object):
 
     def get_action(self, board):
         for n in range(self.num_simu):
-            state_copy = copy.deepcopy((board, 1))  # 1 for we player 1
+            state_copy = deepcopy((board, 1))  # 1 for we player 1
             self.playout(state_copy)
         return max(self.root.children.items(), key=lambda x: x[1].Q)[0]
 
