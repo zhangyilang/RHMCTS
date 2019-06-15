@@ -172,8 +172,7 @@ class RHMCTS(object):
 
 
 class RHMCTSPlayer(object):
-    # def __init__(self, policy_evaluation_fn=policy_evaluation_function, c_puct=5, num_simu=100):
-    def __init__(self, policy_evaluation_fn=coarse_policy_eva_fn, c_puct=1, num_simu=20):
+    def __init__(self, policy_evaluation_fn=policy_evaluation_function, c_puct=5, num_simu=20):
         self.rhmcts = RHMCTS(policy_evaluation_fn, c_puct, num_simu)
 
     def get_action(self, board):
@@ -183,10 +182,9 @@ class RHMCTSPlayer(object):
 
 
 # test
-# if __name__ == "__main__":
-#     test_board = [[0 for i in range(20)] for j in range(20)]
-#     test_board[1][5] = 1
-#     test_board[2][4] = 1
-#     test_board[3][3] = 1
-#     player1 = RHMCTSPlayer()
-#     print(player1.get_action(test_board))
+if __name__ == "__main__":
+    test_board = [[0 for i in range(20)] for j in range(20)]
+    test_board[1][5] = 1
+    test_board[3][3] = 1
+    player1 = RHMCTSPlayer()
+    print(player1.get_action(test_board))

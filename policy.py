@@ -1,4 +1,4 @@
-from random import choice, sample
+from random import choice
 from utils import *
 from copy import deepcopy
 
@@ -12,8 +12,6 @@ heuristic3_p2 = {(0, 2, 2, 2, 0, 0): 4, (0, 0, 2, 2, 2, 0): 1, (0, 2, 2, 0, 2, 0
 h3 = {1: heuristic3_p1, 2: heuristic3_p2}
 
 
-# 辉哥这两个函数交给你了
-# 好的哥
 def policy_evaluation_function(state):
     """
     Return a list of the best n substates (n might change for different states) for current player given current state;
@@ -104,19 +102,6 @@ def simulation_evaluation_function(state):
     return tuple(sub)
 
 
-def coarse_policy_eva_fn(state):
-    board, player = state
-    actions = [(x, y) for x in range(len(board)) for y in range(len(board)) if board[x][y] == 0]
-    act_prob = [(act, 1/len(actions)) for act in actions]
-    return sample(act_prob, 5)
-
-
-def coarse_simu_eva_fn(state):
-    board, player = state
-    actions = [(x, y) for x in range(len(board)) for y in range(len(board)) if board[x][y] == 0]
-    return actions
-
-
 def simulation_policy(state):
     board, player = state
     opponent = 1 if player == 2 else 2
@@ -137,8 +122,7 @@ def simulation_policy(state):
     if len(actions) != 0:
         return choice(actions)
 
-    # actions = simulation_evaluation_function(state)
-    actions = coarse_simu_eva_fn(state)
+    actions = simulation_evaluation_function(state)
     return choice(actions)
 
 

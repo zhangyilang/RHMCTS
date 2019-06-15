@@ -64,7 +64,7 @@ def brain_takeback(x, y):
 
 def brain_turn():
     if pp.terminateAI:
-       return
+        return
     # i = 0
     # while True:
     #     x = random.randint(0, pp.width)
