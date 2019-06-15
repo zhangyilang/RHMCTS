@@ -148,13 +148,13 @@ class RHMCTS(object):
         actions = heuristic(board, 1, 4)
         if len(actions) != 0:
             return choice(actions)
-        actions = heuristic(board, 1, 4)
+        actions = heuristic(board, 2, 4)
         if len(actions) != 0:
             return choice(actions)
         actions = heuristic(board, 1, 3)
         if len(actions) != 0:
             return choice(actions)
-        actions = heuristic(board, 1, 3)
+        actions = heuristic(board, 2, 3)
         if len(actions) != 0:
             return choice(actions)
 
@@ -173,7 +173,7 @@ class RHMCTS(object):
 
 class RHMCTSPlayer(object):
     # def __init__(self, policy_evaluation_fn=policy_evaluation_function, c_puct=5, num_simu=100):
-    def __init__(self, policy_evaluation_fn=coarse_policy_eva_fn, c_puct=1, num_simu=50):
+    def __init__(self, policy_evaluation_fn=coarse_policy_eva_fn, c_puct=1, num_simu=20):
         self.rhmcts = RHMCTS(policy_evaluation_fn, c_puct, num_simu)
 
     def get_action(self, board):
