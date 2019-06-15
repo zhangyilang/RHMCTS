@@ -148,13 +148,13 @@ class RHMCTS(object):
         actions = heuristic(board, 1, 4)
         if len(actions) != 0:
             return choice(actions)
-        actions = heuristic(board, 1, 4)
+        actions = heuristic(board, 2, 4)
         if len(actions) != 0:
             return choice(actions)
         actions = heuristic(board, 1, 3)
         if len(actions) != 0:
             return choice(actions)
-        actions = heuristic(board, 1, 3)
+        actions = heuristic(board, 2, 3)
         if len(actions) != 0:
             return choice(actions)
 
