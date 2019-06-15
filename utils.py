@@ -8,8 +8,9 @@ def extend_board(player, board):
     since the ege play the same role as the opponent for the player
     we set the ege as the opponent ( 3 - player )
     """
-    new_board = [[board[x-1][y-1] if 0 < x < 20 + 2 and 0 < y < 20 + 2 else 3-player \
-                  for x in range(20 + 2)] for y in range(20 + 2)]
+    k = len(board)  # the size of the board
+    new_board = [[board[x-1][y-1] if 0 < x < k + 1 and 0 < y < k + 1 else 3-player \
+                  for x in range(k + 2)] for y in range(k + 2)]
     return new_board
 
 

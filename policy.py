@@ -21,8 +21,9 @@ def policy_evaluation_function(state):
     """
     board, player = state
     moved = [] # the coordinates placed by chess piece
-    for i in range(20):
-        for j in range(20):
+    k = len(board)  # the size of the board
+    for i in range(k):
+        for j in range(k):
             if board[i][j] > 0:
                 moved.append((i, j))
 
@@ -68,8 +69,9 @@ def simulation_evaluation_function(state):
     """
     board, player = state
     moved = []  # the coordinates placed by chess piece
-    for i in range(20):
-        for j in range(20):
+    k = len(board)  # the size of the board
+    for i in range(k):
+        for j in range(k):
             if board[i][j] > 0:
                 moved.append((i, j))
 
@@ -98,8 +100,11 @@ def simulation_evaluation_function(state):
 
     # choose the 5 sub-state with the highest scores
     sub = sorted(sub, key=lambda x: x[1])[:15]
+    sub_coord = []
+    for item in sub:
+        sub_coord.append(item[0])
 
-    return tuple(sub)
+    return tuple(sub_coord)
 
 
 def simulation_policy(state):
