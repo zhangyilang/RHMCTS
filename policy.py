@@ -75,36 +75,37 @@ def simulation_evaluation_function(state):
             if board[i][j] > 0:
                 moved.append((i, j))
 
-    substate = []
+    # substate = []
     adjacent = adjacent_moves(moved)  # get the adjacent of the moved
 
-    sum = 0  # normalization factor
+    # sum = 0  # normalization factor
 
-    for (x, y) in adjacent:
-        board_new = deepcopy(board)
-        if board_new[x][y] > 0:
-            continue
-        else:
-            board_new[x][y] = player
-            score = board_evaluation(board_new)
-            sum += score
-            substate.append(((x, y), score))
+    # for (x, y) in adjacent:
+    #     board_new = deepcopy(board)
+    #     if board_new[x][y] > 0:
+    #         continue
+    #     else:
+    #         board_new[x][y] = player
+    #         score = board_evaluation(board_new)
+    #         sum += score
+    #         substate.append(((x, y), score))
+    #
+    # # Normalize the sub-state
+    # sub = []
+    # for item in substate:
+    #     coord = item[0]
+    #     score_ori = item[1]
+    #     score_new = score_ori / sum
+    #     sub.append((coord, score_new))
+    #
+    # # choose the 15 sub-state with the highest scores
+    # sub = sorted(sub, key=lambda x: x[1])[:15]
+    # sub_coord = []
+    # for item in sub:
+    #     sub_coord.append(item[0])
 
-    # Normalize the sub-state
-    sub = []
-    for item in substate:
-        coord = item[0]
-        score_ori = item[1]
-        score_new = score_ori / sum
-        sub.append((coord, score_new))
-
-    # choose the 5 sub-state with the highest scores
-    sub = sorted(sub, key=lambda x: x[1])[:15]
-    sub_coord = []
-    for item in sub:
-        sub_coord.append(item[0])
-
-    return tuple(sub_coord)
+    # return tuple(sub_coord)
+    return adjacent
 
 
 def simulation_policy(state):

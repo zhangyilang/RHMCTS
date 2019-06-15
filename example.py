@@ -37,6 +37,8 @@ def isFree(x, y):
 def brain_my(x, y):
     if isFree(x, y):
         board[x][y] = 1
+        # update RHMCT
+        player.rhmcts.update_with_move((x, y))
     else:
         pp.pipeOut("ERROR my move [{},{}]".format(x, y))
 
@@ -44,6 +46,8 @@ def brain_my(x, y):
 def brain_opponents(x, y):
     if isFree(x, y):
         board[x][y] = 2
+        # update RHMCT
+        player.rhmcts.update_with_move((x, y))
     else:
         pp.pipeOut("ERROR opponents's move [{},{}]".format(x, y))
 

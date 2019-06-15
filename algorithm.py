@@ -97,7 +97,7 @@ class RHMCTS(object):
         else:  # end == -1 (tie)
             node.update_recursive(0.)
 
-    def simulate(self, state, limit_depth=20):
+    def simulate(self, state, limit_depth=10):
         # simulation stage
         board, player = state
         for depth in range(limit_depth):
@@ -172,12 +172,11 @@ class RHMCTS(object):
 
 
 class RHMCTSPlayer(object):
-    def __init__(self, policy_evaluation_fn=policy_evaluation_function, c_puct=5, num_simu=20):
+    def __init__(self, policy_evaluation_fn=policy_evaluation_function, c_puct=5, num_simu=5):
         self.rhmcts = RHMCTS(policy_evaluation_fn, c_puct, num_simu)
 
     def get_action(self, board):
         action = self.rhmcts.get_action(board)
-        self.rhmcts.update_with_move(-1)     # 改进：向下走两步，重复利用模拟结果
         return action
 
 
