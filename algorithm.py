@@ -1,4 +1,5 @@
 import math
+import time
 from copy import deepcopy
 from policy import *
 
@@ -82,14 +83,9 @@ class RHMCTS(object):
             for act, _ in action_prob:
                 new_board = deepcopy(board)
                 new_board[act[0]][act[1]] = player
-                winner = self.simulate((new_board, opponent))
+                winner = self.simulate((new_board, opponent))   # 0 for a tie, 1 for P1, 2 for P2
                 # backpropagation
-                if winner == player:
-                    leaf_value = 1
-                elif winner == opponent:
-                    leaf_value = -1
-                else:
-                    leaf_value = 0
+                leaf_value = -1 if winner == opponent else winner
                 node.children[act].update_recursive(leaf_value)
 
         elif end is True:
@@ -97,16 +93,19 @@ class RHMCTS(object):
         else:  # end == -1 (tie)
             node.update_recursive(0.)
 
-    def simulate(self, state, limit_depth=10):
+    def simulate(self, state, limit_depth=20):
         # simulation stage
         board, player = state
         for depth in range(limit_depth):
+            if time.time() > time_end:
+                return 0
             x, y = simulation_policy((board, player))
             board[x][y] = player
             end = self.isTerminal(board, x, y, player)
             if end is True:
                 return player
             player = 1 if player == 2 else 2  # switch player
+        return 0
 
     def isTerminal(self, board, x, y, player):
         boardLength = len(board)
@@ -158,8 +157,14 @@ class RHMCTS(object):
         if len(actions) != 0:
             return choice(actions)
 
+        if time_end == -1:
+            actions = policy_evaluation_function((board, 1)) if self.root.is_leaf() else self.root.children.items()
+            return max(actions, key=lambda x: x[1])[0]
+
         for n in range(self.num_simu):
-            state_copy = deepcopy((board, 1))  # 1 for we player 1
+            if time.time() > time_end:
+                break
+            state_copy = deepcopy((board, 1))  # we are player 1
             self.playout(state_copy)
         return max(self.root.children.items(), key=lambda x: x[1].Q)[0]
 
@@ -172,18 +177,26 @@ class RHMCTS(object):
 
 
 class RHMCTSPlayer(object):
-    def __init__(self, policy_evaluation_fn=policy_evaluation_function, c_puct=5, num_simu=5):
+    def __init__(self, policy_evaluation_fn=policy_evaluation_function, c_puct=5, num_simu=10):
         self.rhmcts = RHMCTS(policy_evaluation_fn, c_puct, num_simu)
 
-    def get_action(self, board):
+    def get_action(self, board, time_limit):
+        global time_end
+        time_end = time_limit - 2 if time_limit != -1 else -1
         action = self.rhmcts.get_action(board)
         return action
 
 
 # test
-if __name__ == "__main__":
-    test_board = [[0 for i in range(20)] for j in range(20)]
-    test_board[1][5] = 1
-    test_board[3][3] = 1
-    player1 = RHMCTSPlayer()
-    print(player1.get_action(test_board))
+# if __name__ == "__main__":
+#     test_board = [[0 for i in range(20)] for j in range(20)]
+#     test_board[1][5] = 1
+#     test_board[3][3] = 1
+#     test_board[4][4] = 2
+#     test_board[7][7] = 2
+#     test_board[6][7] = 1
+#     test_board[9][9] = 1
+#     player1 = RHMCTSPlayer()
+#     time1 = time.time()
+#     print(player1.get_action(test_board, time1 + 15))
+#     print(time.time() - time1)

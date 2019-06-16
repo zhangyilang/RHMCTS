@@ -1,4 +1,4 @@
-import random
+import time
 import pisqpipe as pp
 from pisqpipe import DEBUG_EVAL, DEBUG
 import algorithm
@@ -9,6 +9,7 @@ pp.infotext = 'name="HMCTS", author="ElenZhang", version="1.0", country="China",
 MAX_BOARD = 100
 board = [[0 for i in range(MAX_BOARD)] for j in range(MAX_BOARD)]
 player = algorithm.RHMCTSPlayer()
+stepcount = None
 
 
 def brain_init():
@@ -67,21 +68,20 @@ def brain_takeback(x, y):
 
 
 def brain_turn():
+    time_start = time.time()
     if pp.terminateAI:
         return
-    # i = 0
-    # while True:
-    #     x = random.randint(0, pp.width)
-    #     y = random.randint(0, pp.height)
-    #     i += 1
-    #     if pp.terminateAI:
-    #         return
-    #     if isFree(x, y):
-    #         break
-    # if i > 1:
-    #     pp.pipeOut("DEBUG {} coordinates didn't hit an empty field".format(i))
-    (x, y) = player.get_action(board)
+    global stepcount
+    if stepcount is None:
+        stepcount = 0
+        for i in range(len(board)):
+            for j in range(len(board)):
+                if board[i][j] == 1:
+                    stepcount += 1
+    time_limit = 15 + time_start if stepcount > 5 else -1
+    (x, y) = player.get_action(board, time_limit)
     pp.do_mymove(x, y)
+    stepcount += 1
 
 
 def brain_end():

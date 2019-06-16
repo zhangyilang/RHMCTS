@@ -35,16 +35,16 @@ def policy_evaluation_function(state):
     new_adjacent = adjacent_moves(moved)  # the adjacent' adjacent
     adjacent = adjacent + new_adjacent
 
-    sum = 0  # normalization factor
+    sum_score = 0  # normalization factor
 
     for (x, y) in adjacent:
-        board_new = deepcopy(board)
-        if board_new[x][y] > 0:
+        if board[x][y] > 0:
             continue
         else:
-            board_new[x][y] = player
-            score = board_evaluation(board_new)
-            sum += score
+            board[x][y] = player
+            score = board_evaluation(board)
+            board[x][y] = 0     # 辉哥我给你改了
+            sum_score += score
             substate.append(((x, y), score))
 
     # Normalize the sub-state
@@ -52,7 +52,7 @@ def policy_evaluation_function(state):
     for item in substate:
         coord = item[0]
         score_ori = item[1]
-        score_new = score_ori / sum
+        score_new = score_ori / sum_score
         sub.append((coord, score_new))
 
     # choose the 5 sub-state with the highest scores
