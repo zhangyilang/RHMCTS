@@ -144,18 +144,24 @@ class RHMCTS(object):
 
     def get_action(self, board):
 
-        actions = heuristic(board, 1, 4)
-        if len(actions) != 0:
-            return choice(actions)
-        actions = heuristic(board, 2, 4)
-        if len(actions) != 0:
-            return choice(actions)
-        actions = heuristic(board, 1, 3)
-        if len(actions) != 0:
-            return choice(actions)
-        actions = heuristic(board, 2, 3)
-        if len(actions) != 0:
-            return choice(actions)
+        action = heuristic1(board, 1)
+        if action is not None:
+            return action
+        action = heuristic1(board, 2)
+        if action is not None:
+            return action
+        action = heuristic2(board, 1)
+        if action is not None:
+            return action
+        action = heuristic2(board, 2)
+        if action is not None:
+            return action
+        action = heuristic3(board, 1)
+        if action is not None:
+            return action
+        action = heuristic3(board, 2)
+        if action is not None:
+            return action
 
         if time_end == -1:
             actions = policy_evaluation_function((board, 1)) if self.root.is_leaf() else self.root.children.items()
@@ -188,15 +194,13 @@ class RHMCTSPlayer(object):
 
 
 # test
-# if __name__ == "__main__":
-#     test_board = [[0 for i in range(20)] for j in range(20)]
-#     test_board[1][5] = 1
-#     test_board[3][3] = 1
-#     test_board[4][4] = 2
-#     test_board[7][7] = 2
-#     test_board[6][7] = 1
-#     test_board[9][9] = 1
-#     player1 = RHMCTSPlayer()
-#     time1 = time.time()
-#     print(player1.get_action(test_board, time1 + 15))
-#     print(time.time() - time1)
+if __name__ == "__main__":
+    test_board = [[0 for i in range(20)] for j in range(20)]
+    test_board[5][5] = 1
+    test_board[6][5] = 1
+    test_board[5][7] = 1
+    test_board[6][6] = 1
+    player1 = RHMCTSPlayer()
+    time1 = time.time()
+    print(player1.get_action(test_board, time1 + 15))
+    print(time.time() - time1)
