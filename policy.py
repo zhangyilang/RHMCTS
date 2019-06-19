@@ -11,11 +11,6 @@ def policy_evaluation_function(state, moved_, adjacent_):
     """
     board, player = state
     moved = moved_  # the coordinates placed by chess piece
-    # k = len(board)  # the size of the board
-    # for i in range(k):
-    #     for j in range(k):
-    #         if board[i][j] > 0:
-    #             moved.append((i, j))
 
     substate = []
     adjacent = adjacent_

@@ -100,11 +100,6 @@ class RHMCTS(object):
         board, player = state
         adjacent = self.adjancent
         moved = self.moved  # the coordinates placed by chess piece
-        # k = len(board)  # the size of the board
-        # for i in range(k):
-        #     for j in range(k):
-        #         if board[i][j] > 0:
-        #             moved.append((i, j))
         for depth in range(limit_depth):
             if time.time() > time_end:
                 return 0
