@@ -257,22 +257,22 @@ def adjacent_2_moves(moved):
         if w > 1 and h > 1:
             adjacent.add((h-2, w-2))  # lower left
 
-        if w < width - 2 and h < height - 1:
-            adjacent.add((h+1, w+2))
-        if w < width - 1 and h < height - 2:
-            adjacent.add((h+2, w+2))
-        if h > 1 and w < height - 1:
-            adjacent.add((h-2, w+1))
-        if h > 0 and w < height - 2:
-            adjacent.add((h-1, w+2))
-        if h < width - 2 and w > 0:
-            adjacent.add((h+2, w-1))
-        if h < width - 1 and w > 1:
-            adjacent.add((h+1, w-2))
-        if w > 1 and h > 0:
-            adjacent.add((h-1, w-2))
-        if w > 0 and h > 1:
-            adjacent.add((h-2, w-1))
+        # if w < width - 2 and h < height - 1:
+        #     adjacent.add((h+1, w+2))
+        # if w < width - 1 and h < height - 2:
+        #     adjacent.add((h+2, w+2))
+        # if h > 1 and w < height - 1:
+        #     adjacent.add((h-2, w+1))
+        # if h > 0 and w < height - 2:
+        #     adjacent.add((h-1, w+2))
+        # if h < width - 2 and w > 0:
+        #     adjacent.add((h+2, w-1))
+        # if h < width - 1 and w > 1:
+        #     adjacent.add((h+1, w-2))
+        # if w > 1 and h > 0:
+        #     adjacent.add((h-1, w-2))
+        # if w > 0 and h > 1:
+        #     adjacent.add((h-2, w-1))
 
     adjacent = list(set(adjacent) - set(moved))
 

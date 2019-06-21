@@ -230,10 +230,11 @@ class RHMCTSPlayer(object):
 # test
 if __name__ == "__main__":
     test_board = [[0 for i in range(20)] for j in range(20)]
-    test_board[5][5] = 1
     test_board[6][10] = 1
-    test_board[5][7] = 1
-    test_board[6][6] = 1
+    test_board[6][9] = 1
+    test_board[6][5] = 1
+    test_board[7][5] = 1
+    test_board[19][5] = 1
     player1 = RHMCTSPlayer()
     # player1.rhmcts.moved.append((5, 5))
     # player1.rhmcts.adjancent = player1.rhmcts.updata_adjacent(player1.rhmcts.moved, player1.rhmcts.adjancent, (5, 5))
