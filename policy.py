@@ -2,7 +2,7 @@ from random import choice
 from utils import *
 
 
-def policy_evaluation_function(state, moved_, adjacent_):
+def policy_evaluation_function(state):
     """
     Return a list of the best n substates (n might change for different states) for current player given current state;
     :param state: [board, player], where board is a 2-d list and player is either 1 or 2;
@@ -10,16 +10,19 @@ def policy_evaluation_function(state, moved_, adjacent_):
              piece and corresponding estimated winning prob for current player.
     """
     board, player = state
-    moved = moved_  # the coordinates placed by chess piece
+    moved = []
+    for i in range(20):
+        for j in range(20):
+            if board[i][j] > 0:
+                moved.append((i, j))
 
     substate = []
-    adjacent = adjacent_
-    adjacent_eight = adjacent_moves(moved[-8:])  # get the adjacent of the moved
+    adjacent = adjacent_2_moves(moved)  # get the adjacent of the moved
 
     # suppose the coordinates in the adjacent have been placed by chess piece
-    moved = moved + adjacent_eight
-    new_adjacent = adjacent_moves(moved)  # the adjacent' adjacent
-    adjacent = adjacent + new_adjacent
+    # moved = moved + adjacent_eight
+    # new_adjacent = adjacent_moves(moved)  # the adjacent' adjacent
+    # adjacent = adjacent + new_adjacent
 
     sum_score = 0  # normalization factor
 
@@ -47,24 +50,24 @@ def policy_evaluation_function(state, moved_, adjacent_):
     return tuple(sub)
 
 
-def simulation_evaluation_function(adjacent_):
+def simulation_evaluation_function(state):
     """
     Simplified version of policy_evaluation function. Return more possible actions without probability.
     :param state: [board, player]
     :return: [(x0, y0), (x1, y1), ... , (xn, yn)]
     """
-    # board, player = state
-    # moved = []  # the coordinates placed by chess piece
-    # k = len(board)  # the size of the board
-    # for i in range(k):
-    #     for j in range(k):
-    #         if board[i][j] > 0:
-    #             moved.append((i, j))
-    # adjacent = adjacent_moves(moved)  # get the adjacent of the moved
-    return adjacent_
+    board, player = state
+    moved = []  # the coordinates placed by chess piece
+    k = len(board)  # the size of the board
+    for i in range(k):
+        for j in range(k):
+            if board[i][j] > 0:
+                moved.append((i, j))
+    adjacent = adjacent_moves(moved)  # get the adjacent of the moved
+    return adjacent
 
 
-def simulation_policy(state, moved_, adjacent_):
+def simulation_policy(state):
     board, player = state
     opponent = 1 if player == 2 else 2
 
@@ -89,7 +92,7 @@ def simulation_policy(state, moved_, adjacent_):
     if action is not None:
         return action
 
-    actions = simulation_evaluation_function(adjacent_)
+    actions = simulation_evaluation_function(state)
     return choice(actions)
 
 

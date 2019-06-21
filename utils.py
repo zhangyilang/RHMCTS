@@ -212,3 +212,68 @@ def adjacent_moves(moved):
 
     return adjacent
 
+
+def adjacent_2_moves(moved):
+    """
+    find the neighbors of the moved
+    """
+    adjacent = set()
+    width = 20
+    height = 20
+
+    for (h, w) in moved:
+        if h < width - 1:
+            adjacent.add((h+1, w))  # right
+        if h > 0:
+            adjacent.add((h-1, w))  # left
+        if w < height - 1:
+            adjacent.add((h, w+1))  # upper
+        if w > 0:
+            adjacent.add((h, w-1))  # lower
+        if w < width - 1 and h < height - 1:
+            adjacent.add((h+1, w+1))  # upper right
+        if h > 0 and w < height - 1:
+            adjacent.add((h-1, w+1))  # upper left
+        if h < width - 1 and w > 0:
+            adjacent.add((h+1, w-1))  # lower right
+        if w > 0 and h > 0:
+            adjacent.add((h-1, w-1))  # lower left
+
+        # adj's adj
+        if h < width - 2:
+            adjacent.add((h+2, w))  # right
+        if h-1 > 0:
+            adjacent.add((h-2, w))  # left
+        if w < height - 2:
+            adjacent.add((h, w+2))  # upper
+        if w > 1:
+            adjacent.add((h, w-2))  # lower
+        if w < width - 2 and h < height - 2:
+            adjacent.add((h+2, w+2))  # upper right
+        if h > 1 and w < height - 2:
+            adjacent.add((h-2, w+2))  # upper left
+        if h < width - 2 and w > 1:
+            adjacent.add((h+2, w-2))  # lower right
+        if w > 1 and h > 1:
+            adjacent.add((h-2, w-2))  # lower left
+
+        if w < width - 2 and h < height - 1:
+            adjacent.add((h+1, w+2))
+        if w < width - 1 and h < height - 2:
+            adjacent.add((h+2, w+2))
+        if h > 1 and w < height - 1:
+            adjacent.add((h-2, w+1))
+        if h > 0 and w < height - 2:
+            adjacent.add((h-1, w+2))
+        if h < width - 2 and w > 0:
+            adjacent.add((h+2, w-1))
+        if h < width - 1 and w > 1:
+            adjacent.add((h+1, w-2))
+        if w > 1 and h > 0:
+            adjacent.add((h-1, w-2))
+        if w > 0 and h > 1:
+            adjacent.add((h-2, w-1))
+
+    adjacent = list(set(adjacent) - set(moved))
+
+    return adjacent

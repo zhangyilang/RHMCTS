@@ -61,8 +61,8 @@ class RHMCTS(object):
         self.policy = policy_value_fn
         self.c_puct = c_puct
         self.num_simu = max_depth
-        self.moved = []
-        self.adjancent = []
+        # self.moved = []
+        # self.adjancent = []
 
     def playout(self, state, num_simu=10):
         board, player = state
@@ -78,7 +78,7 @@ class RHMCTS(object):
 
         if end is False:
             # expansion: expand the best n substates.
-            action_prob = self.policy((board, player), self.moved, self.adjancent)
+            action_prob = self.policy((board, player))
             node.expand(action_prob)
             # simulation
             opponent = 1 if player == 2 else 2    # switch player
@@ -99,15 +99,15 @@ class RHMCTS(object):
     def simulate(self, state, limit_depth=50):
         # simulation stage
         board, player = state
-        adjacent = self.adjancent
-        moved = self.moved  # the coordinates placed by chess piece
+        # adjacent = self.adjancent
+        # moved = self.moved  # the coordinates placed by chess piece
         for depth in range(limit_depth):
             if time.time() > time_end:
                 return 0
-            x, y = simulation_policy((board, player), moved, adjacent)
+            x, y = simulation_policy((board, player))
             board[x][y] = player
-            moved.append((x, y))
-            adjacent = self.updata_adjacent(moved, adjacent, (x,y))
+            # moved.append((x, y))
+            # adjacent = self.updata_adjacent(moved, adjacent, (x,y))
             end = self.isTerminal(board, x, y, player)
             if end is True:
                 return player
@@ -190,31 +190,30 @@ class RHMCTS(object):
         else:
             self.root = TreeNode(None, 1.0)
 
-    def updata_adjacent(self, moved, adjacent_ori, action):
-        h, w = action
-        width = 20
-        height = 20
-        adjacent = set()
-        if h < width - 1:
-            adjacent.add((h + 1, w))  # right
-        if h > 0:
-            adjacent.add((h - 1, w))  # left
-        if w < height - 1:
-            adjacent.add((h, w + 1))  # upper
-        if w > 0:
-            adjacent.add((h, w - 1))  # lower
-        if w < width - 1 and h < height - 1:
-            adjacent.add((h + 1, w + 1))  # upper right
-        if h > 0 and w < height - 1:
-            adjacent.add((h - 1, w + 1))  # upper left
-        if h < width - 1 and w > 0:
-            adjacent.add((h + 1, w - 1))  # lower right
-        if w > 0 and h > 0:
-            adjacent.add((h - 1, w - 1))  # lower left
-        adjacent = adjacent - set(moved)
-        adjacent = adjacent | set(adjacent_ori)
-        return list(adjacent)
-
+    # def updata_adjacent(self, moved, adjacent_ori, action):
+    #     h, w = action
+    #     width = 20
+    #     height = 20
+    #     adjacent = set()
+    #     if h < width - 1:
+    #         adjacent.add((h + 1, w))  # right
+    #     if h > 0:
+    #         adjacent.add((h - 1, w))  # left
+    #     if w < height - 1:
+    #         adjacent.add((h, w + 1))  # upper
+    #     if w > 0:
+    #         adjacent.add((h, w - 1))  # lower
+    #     if w < width - 1 and h < height - 1:
+    #         adjacent.add((h + 1, w + 1))  # upper right
+    #     if h > 0 and w < height - 1:
+    #         adjacent.add((h - 1, w + 1))  # upper left
+    #     if h < width - 1 and w > 0:
+    #         adjacent.add((h + 1, w - 1))  # lower right
+    #     if w > 0 and h > 0:
+    #         adjacent.add((h - 1, w - 1))  # lower left
+    #     adjacent = adjacent - set(moved)
+    #     adjacent = adjacent | set(adjacent_ori)
+    #     return list(adjacent)
 
 
 class RHMCTSPlayer(object):
@@ -236,14 +235,14 @@ if __name__ == "__main__":
     test_board[5][7] = 1
     test_board[6][6] = 1
     player1 = RHMCTSPlayer()
-    player1.rhmcts.moved.append((5, 5))
-    player1.rhmcts.adjancent = player1.rhmcts.updata_adjacent(player1.rhmcts.moved, player1.rhmcts.adjancent, (5, 5))
-    player1.rhmcts.moved.append((6, 10))
-    player1.rhmcts.adjancent = player1.rhmcts.updata_adjacent(player1.rhmcts.moved, player1.rhmcts.adjancent, (6, 10))
-    player1.rhmcts.moved.append((5, 7))
-    player1.rhmcts.adjancent = player1.rhmcts.updata_adjacent(player1.rhmcts.moved, player1.rhmcts.adjancent, (5, 7))
-    player1.rhmcts.moved.append((6, 6))
-    player1.rhmcts.adjancent = player1.rhmcts.updata_adjacent(player1.rhmcts.moved, player1.rhmcts.adjancent, (6, 6))
+    # player1.rhmcts.moved.append((5, 5))
+    # player1.rhmcts.adjancent = player1.rhmcts.updata_adjacent(player1.rhmcts.moved, player1.rhmcts.adjancent, (5, 5))
+    # player1.rhmcts.moved.append((6, 10))
+    # player1.rhmcts.adjancent = player1.rhmcts.updata_adjacent(player1.rhmcts.moved, player1.rhmcts.adjancent, (6, 10))
+    # player1.rhmcts.moved.append((5, 7))
+    # player1.rhmcts.adjancent = player1.rhmcts.updata_adjacent(player1.rhmcts.moved, player1.rhmcts.adjancent, (5, 7))
+    # player1.rhmcts.moved.append((6, 6))
+    # player1.rhmcts.adjancent = player1.rhmcts.updata_adjacent(player1.rhmcts.moved, player1.rhmcts.adjancent, (6, 6))
     time1 = time.time()
     print(player1.get_action(test_board, time1 + 15))
     print(time.time() - time1)
