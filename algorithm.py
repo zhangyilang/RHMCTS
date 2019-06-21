@@ -171,7 +171,7 @@ class RHMCTS(object):
             return action
 
         if time_end == -1:
-            actions = policy_evaluation_function((board, 1), self.moved, self.adjancent) if self.root.is_leaf() else self.root.children.items()
+            actions = policy_evaluation_function((board, 1)) if self.root.is_leaf() else self.root.children.items()
             return max(actions, key=lambda x: x[1])[0]
 
         for n in range(self.num_simu):
@@ -181,14 +181,14 @@ class RHMCTS(object):
             self.playout(state_copy)
         return max(self.root.children.items(), key=lambda x: x[1].Q)[0]
 
-    def update_with_move(self, last_move):
-        self.moved.append(last_move)
-        self.adjancent = self.updata_adjacent(self.moved, self.adjancent, last_move)
-        # Step forward in the tree, keeping everything we already know about the subtree.
-        if last_move in self.root.children:
-            self.root = self.root.children[last_move]
-        else:
-            self.root = TreeNode(None, 1.0)
+    # def update_with_move(self, last_move):
+    #     self.moved.append(last_move)
+    #     self.adjancent = self.updata_adjacent(self.moved, self.adjancent, last_move)
+    #     # Step forward in the tree, keeping everything we already know about the subtree.
+    #     if last_move in self.root.children:
+    #         self.root = self.root.children[last_move]
+    #     else:
+    #         self.root = TreeNode(None, 1.0)
 
     # def updata_adjacent(self, moved, adjacent_ori, action):
     #     h, w = action
