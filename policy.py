@@ -18,7 +18,6 @@ def policy_evaluation_function(state):
 
     substate = []
     adjacent = adjacent_2_moves(moved)  # get the adjacent of the moved
-    print(adjacent)
 
     # suppose the coordinates in the adjacent have been placed by chess piece
     # moved = moved + adjacent_eight
