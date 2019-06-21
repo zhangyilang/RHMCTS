@@ -46,7 +46,7 @@ class TreeNode(object):
 
 
 class RHMCTS(object):
-    def __init__(self, policy_value_fn, c_puct=1, num_simu=10000):
+    def __init__(self, policy_value_fn, c_puct=1, max_depth=10):
         """
         :param policy_value_fn: a function that takes in a board state and outputs
             a list of (action, probability) tuples and also a score in [-1, 1]
@@ -60,11 +60,11 @@ class RHMCTS(object):
         self.root = TreeNode(None, 1.0)
         self.policy = policy_value_fn
         self.c_puct = c_puct
-        self.num_simu = num_simu
+        self.num_simu = max_depth
         self.moved = []
         self.adjancent = []
 
-    def playout(self, state):
+    def playout(self, state, num_simu=10):
         board, player = state
         node = self.root
 
@@ -83,19 +83,20 @@ class RHMCTS(object):
             # simulation
             opponent = 1 if player == 2 else 2    # switch player
             for act, _ in action_prob:
-                new_board = deepcopy(board)
-                new_board[act[0]][act[1]] = player
-                winner = self.simulate((new_board, opponent))   # 0 for a tie, 1 for P1, 2 for P2
-                # backpropagation
-                leaf_value = -1 if winner == opponent else winner
-                node.children[act].update_recursive(leaf_value)
+                for i in range(num_simu):
+                    new_board = deepcopy(board)
+                    new_board[act[0]][act[1]] = player
+                    winner = self.simulate((new_board, opponent))   # 0 for a tie, 1 for P1, 2 for P2
+                    # backpropagation
+                    leaf_value = -1 if winner == opponent else winner
+                    node.children[act].update_recursive(leaf_value)
 
         elif end is True:
             node.update_recursive(1.)
         else:  # end == -1 (tie)
             node.update_recursive(0.)
 
-    def simulate(self, state, limit_depth=20):
+    def simulate(self, state, limit_depth=50):
         # simulation stage
         board, player = state
         adjacent = self.adjancent
@@ -217,8 +218,8 @@ class RHMCTS(object):
 
 
 class RHMCTSPlayer(object):
-    def __init__(self, policy_evaluation_fn=policy_evaluation_function, c_puct=5, num_simu=10):
-        self.rhmcts = RHMCTS(policy_evaluation_fn, c_puct, num_simu)
+    def __init__(self, policy_evaluation_fn=policy_evaluation_function, c_puct=1, max_depth=5):
+        self.rhmcts = RHMCTS(policy_evaluation_fn, c_puct, max_depth)
 
     def get_action(self, board, time_limit):
         global time_end
