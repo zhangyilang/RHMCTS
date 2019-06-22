@@ -32,7 +32,7 @@ def policy_evaluation_function(state):
         else:
             board[x][y] = player
             score = board_evaluation(board)
-            board[x][y] = 0     # 辉哥我给你改了
+            board[x][y] = 0
             sum_score += score
             substate.append(((x, y), score))
 

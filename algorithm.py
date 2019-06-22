@@ -64,7 +64,7 @@ class RHMCTS(object):
         # self.moved = []
         # self.adjancent = []
 
-    def playout(self, state, num_simu=10):
+    def playout(self, state):
         board, player = state
         node = self.root
 
@@ -83,20 +83,19 @@ class RHMCTS(object):
             # simulation
             opponent = 1 if player == 2 else 2    # switch player
             for act, _ in action_prob:
-                for i in range(num_simu):
-                    new_board = deepcopy(board)
-                    new_board[act[0]][act[1]] = player
-                    winner = self.simulate((new_board, opponent))   # 0 for a tie, 1 for P1, 2 for P2
-                    # backpropagation
-                    leaf_value = -1 if winner == opponent else winner
-                    node.children[act].update_recursive(leaf_value)
+                new_board = deepcopy(board)
+                new_board[act[0]][act[1]] = player
+                winner = self.simulate((new_board, opponent))   # 0 for a tie, 1 for P1, 2 for P2
+                # backpropagation
+                leaf_value = -1 if winner == opponent else winner
+                node.children[act].update_recursive(leaf_value)
 
         elif end is True:
             node.update_recursive(1.)
         else:  # end == -1 (tie)
             node.update_recursive(0.)
 
-    def simulate(self, state, limit_depth=50):
+    def simulate(self, state, limit_depth=10):
         # simulation stage
         board, player = state
         # adjacent = self.adjancent
@@ -222,7 +221,7 @@ class RHMCTSPlayer(object):
 
     def get_action(self, board, time_limit):
         global time_end
-        time_end = time_limit - 2 if time_limit != -1 else -1
+        time_end = time_limit if time_limit != -1 else -1
         action = self.rhmcts.get_action(board)
         return action
 
