@@ -47,9 +47,15 @@ def policy_evaluation_function(state):
         sub.append((coord, score_new))
 
     # choose the 5 sub-state with the highest scores
-    sub = sorted(sub, key=lambda x: -x[1])[:5]
+    sub = sorted(sub, key=lambda x: x[1], reverse=True)[:5]
 
-    return tuple(sub)
+    # normalization
+    sub_norm = []
+    max_score = sub[0][1]
+    for s in sub:
+        sub_norm.append((s[0], s[1] / max_score * 0.9))
+
+    return tuple(sub_norm)
 
 
 def simulation_evaluation_function(state):
