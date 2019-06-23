@@ -17,7 +17,7 @@ def policy_evaluation_function(state):
                 moved.append((i, j))
 
     substate = []
-    adjacent = adjacent_2_moves(moved)  # get the adjacent of the moved
+    adjacent = adjacent_moves(moved)  # get the adjacent of the moved
 
     # suppose the coordinates in the adjacent have been placed by chess piece
     # moved = moved + adjacent_eight
@@ -36,6 +36,8 @@ def policy_evaluation_function(state):
             sum_score += score
             substate.append(((x, y), score))
 
+    # print(substate)
+
     # Normalize the sub-state
     sub = []
     for item in substate:
@@ -45,7 +47,7 @@ def policy_evaluation_function(state):
         sub.append((coord, score_new))
 
     # choose the 5 sub-state with the highest scores
-    sub = sorted(sub, key=lambda x: x[1])[:5]
+    sub = sorted(sub, key=lambda x: -x[1])[:5]
 
     return tuple(sub)
 
@@ -64,7 +66,23 @@ def simulation_evaluation_function(state):
             if board[i][j] > 0:
                 moved.append((i, j))
     adjacent = adjacent_moves(moved)  # get the adjacent of the moved
-    return adjacent
+
+    substate = []
+    for (x, y) in adjacent:
+        if board[x][y] > 0:
+            continue
+        else:
+            board[x][y] = player
+            score = board_evaluation(board)
+            board[x][y] = 0
+            substate.append(((x, y), score))
+
+    substate = sorted(substate, key=lambda x: -x[1])[:10]
+    sub = []
+    for item in substate:
+        coord = item[0]
+        sub.append(coord)
+    return sub
 
 
 def simulation_policy(state):

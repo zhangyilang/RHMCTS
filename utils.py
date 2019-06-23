@@ -147,16 +147,16 @@ def class_to_score():
     :return:
         score_map: a map from the special class(a string) to score(a real number)
     """
-    score_map = {"WIN": 100000,
+    score_map = {"WIN": 200000,
                  "H4": 10000,
-                 "C4": 100,
-                 "H3": 200,
-                 "M3": 50,
-                 "H2": 5,
-                 "M2": 3,
-                 "S4": -5,
-                 "S3": -5,
-                 "S2": -5
+                 "C4": 1000,
+                 "H3": 500,
+                 "M3": 200,
+                 "H2": 50,
+                 "M2": 30,
+                 "S4": 20,
+                 "S3": 5,
+                 "S2": -10
                  }
     return score_map
 

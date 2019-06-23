@@ -235,14 +235,6 @@ if __name__ == "__main__":
     test_board[7][5] = 1
     test_board[19][5] = 1
     player1 = RHMCTSPlayer()
-    # player1.rhmcts.moved.append((5, 5))
-    # player1.rhmcts.adjancent = player1.rhmcts.updata_adjacent(player1.rhmcts.moved, player1.rhmcts.adjancent, (5, 5))
-    # player1.rhmcts.moved.append((6, 10))
-    # player1.rhmcts.adjancent = player1.rhmcts.updata_adjacent(player1.rhmcts.moved, player1.rhmcts.adjancent, (6, 10))
-    # player1.rhmcts.moved.append((5, 7))
-    # player1.rhmcts.adjancent = player1.rhmcts.updata_adjacent(player1.rhmcts.moved, player1.rhmcts.adjancent, (5, 7))
-    # player1.rhmcts.moved.append((6, 6))
-    # player1.rhmcts.adjancent = player1.rhmcts.updata_adjacent(player1.rhmcts.moved, player1.rhmcts.adjancent, (6, 6))
     time1 = time.time()
     print(player1.get_action(test_board, time1 + 15))
     print(time.time() - time1)
