@@ -89,6 +89,8 @@ class RHMCTS(object):
                     winner = self.simulate((new_board, opponent))   # 0 for a tie, 1 for P1, 2 for P2
                     # backpropagation
                     leaf_value = -1 if winner == opponent else winner
+                    # print(act)
+                    # print(leaf_value)
                     node.children[act].update_recursive(leaf_value)
 
         elif end is True:
@@ -179,6 +181,7 @@ class RHMCTS(object):
                 break
             state_copy = deepcopy((board, 1))  # we are player 1
             self.playout(state_copy)
+        # print(self.root.children.items())
         return max(self.root.children.items(), key=lambda x: x[1].Q)[0]
 
     def update_with_move(self, last_move):
@@ -234,18 +237,11 @@ class RHMCTSPlayer(object):
 # test
 if __name__ == "__main__":
     test_board = [[0 for i in range(20)] for j in range(20)]
-    test_board[3][1] = 1
-    test_board[2][2] = 2
-    test_board[1][3] = 1
-    test_board[9][9] = 2
-    test_board[10][10] = 2
-    test_board[3][1] = 1
-    test_board[1][4] = 2
-    test_board[1][1] = 1
-    test_board[1][2] = 1
-    test_board[4][1] = 1
-    test_board[2][1] = 2
-
+    test_board[0][8] = 1
+    test_board[0][9] = 1
+    test_board[1][10] = 1
+    test_board[2][10] = 1
+    # test_board[2][9] = 1
     player1 = RHMCTSPlayer()
     # time1 = time.time()
     # print(player1.get_action(test_board, time1 + 15))

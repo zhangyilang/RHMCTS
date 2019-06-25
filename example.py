@@ -78,7 +78,7 @@ def brain_turn():
             for j in range(len(board)):
                 if board[i][j] == 1:
                     stepcount += 1
-    time_limit = 10 + time_start if stepcount > 3 else -1
+    time_limit = 5 + time_start if stepcount > 3 else -1
     (x, y) = player.get_action(board, time_limit)
     pp.do_mymove(x, y)
     stepcount += 1

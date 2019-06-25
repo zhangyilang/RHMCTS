@@ -24,36 +24,49 @@ def policy_evaluation_function(state):
     # new_adjacent = adjacent_moves(moved)  # the adjacent' adjacent
     # adjacent = adjacent + new_adjacent
 
-    sum_score = 0  # normalization factor
+    # sum_score = 0  # normalization factor
 
     for (x, y) in adjacent:
         if board[x][y] > 0:
             continue
         else:
             board[x][y] = player
-            score = board_evaluation(board)
+            score = board_evaluation(board, player)
             board[x][y] = 0
-            sum_score += score
+            # sum_score += score
             substate.append(((x, y), score))
+
+    #print(substate)
 
     # print(substate)
 
     # Normalize the sub-state
-    sub = []
-    for item in substate:
-        coord = item[0]
-        score_ori = item[1]
-        score_new = score_ori / sum_score
-        sub.append((coord, score_new))
+    # sub = []
+    # for item in substate:
+    #     coord = item[0]
+    #     score_ori = item[1]
+    #     score_new = score_ori / sum_score
+    #     sub.append((coord, score_new))
 
     # choose the 5 sub-state with the highest scores
-    sub = sorted(sub, key=lambda x: x[1], reverse=True)[:3]
+    sub = sorted(substate, key=lambda x: x[1], reverse=True)[:3]
+    # print(sub)
 
     # normalization
     sub_norm = []
     max_score = sub[0][1]
-    for s in sub:
-        sub_norm.append((s[0], s[1] / max_score * 0.9))
+    min_score = sub[-1][1]
+    # print(max_score)
+    # print(min_score)
+    # print(sub)
+    if max_score != min_score:
+        for s in sub:
+            sub_norm.append((s[0], (s[1] - min_score + 5) / (max_score - min_score) * 0.9))
+    else:
+        for s in sub:
+            sub_norm.append((s[0], 0.9))
+
+    # print(sub_norm)
 
     return tuple(sub_norm)
 
@@ -79,7 +92,7 @@ def simulation_evaluation_function(state):
             continue
         else:
             board[x][y] = player
-            score = board_evaluation(board)
+            score = board_evaluation(board, player)
             board[x][y] = 0
             substate.append(((x, y), score))
 
@@ -98,23 +111,23 @@ def simulation_policy(state):
     action = heuristic1(board, player)
     if action is not None:
         return action
-    # action = heuristic1(board, opponent)
-    # if action is not None:
-    #     return action
-    #
-    # action = heuristic2(board, player)
-    # if action is not None:
-    #     return action
-    # action = heuristic2(board, opponent)
-    # if action is not None:
-    #     return action
-    #
-    # action = heuristic3(board, player)
-    # if action is not None:
-    #     return action
-    # action = heuristic3(board, opponent)
-    # if action is not None:
-    #     return action
+    action = heuristic1(board, opponent)
+    if action is not None:
+        return action
+
+    action = heuristic2(board, player)
+    if action is not None:
+        return action
+    action = heuristic2(board, opponent)
+    if action is not None:
+        return action
+
+    action = heuristic3(board, player)
+    if action is not None:
+        return action
+    action = heuristic3(board, opponent)
+    if action is not None:
+        return action
 
     moved = []
     for i in range(20):
@@ -132,11 +145,15 @@ def simulation_policy(state):
 def heuristic1(board, player):
     # heuristic for direct winning
     boardLength = len(board)
+    opp = 3 - player
     # column
     for x in range(boardLength-4):
         for y in range(boardLength):
             pieces = tuple(board[x+d][y] for d in range(5))
             if pieces.count(player) == 4 and 0 in pieces:
+                d = pieces.index(0)
+                return x + d, y
+            if pieces.count(opp) == 4 and 0 in pieces:
                 d = pieces.index(0)
                 return x + d, y
     # row
@@ -146,11 +163,17 @@ def heuristic1(board, player):
             if pieces.count(player) == 4 and 0 in pieces:
                 d = pieces.index(0)
                 return x, y + d
+            if pieces.count(opp) == 4 and 0 in pieces:
+                d = pieces.index(0)
+                return x, y + d
     # positive diagonal
     for x in range(boardLength-4):
         for y in range(boardLength-4):
             pieces = tuple(board[x+d][y+d] for d in range(5))
             if pieces.count(player) == 4 and 0 in pieces:
+                d = pieces.index(0)
+                return x + d, y + d
+            if pieces.count(opp) == 4 and 0 in pieces:
                 d = pieces.index(0)
                 return x + d, y + d
     # oblique diagonal
@@ -160,17 +183,24 @@ def heuristic1(board, player):
             if pieces.count(player) == 4 and 0 in pieces:
                 d = pieces.index(0)
                 return x + d, y - d
+            if pieces.count(opp) == 4 and 0 in pieces:
+                d = pieces.index(0)
+                return x + d, y - d
     return None
 
 
 def heuristic2(board, player):
     # heuristic for direct winning
     boardLength = len(board)
+    opp = 3 - player
     # column
     for x in range(boardLength-5):
         for y in range(boardLength):
             pieces = tuple(board[x+d][y] for d in range(6))
             if pieces[0] == 0 and pieces[5] == 0 and pieces[1:5].count(player) == 3 and 0 in pieces[1:5]:
+                d = pieces.index(0, 1, -1)
+                return x + d, y
+            if pieces[0] == 0 and pieces[5] == 0 and pieces[1:5].count(opp) == 3 and 0 in pieces[1:5]:
                 d = pieces.index(0, 1, -1)
                 return x + d, y
     # row
@@ -180,6 +210,9 @@ def heuristic2(board, player):
             if pieces[0] == 0 and pieces[5] == 0 and pieces[1:5].count(player) == 3 and 0 in pieces[1:5]:
                 d = pieces.index(0, 1, -1)
                 return x, y + d
+            if pieces[0] == 0 and pieces[5] == 0 and pieces[1:5].count(opp) == 3 and 0 in pieces[1:5]:
+                d = pieces.index(0, 1, -1)
+                return x, y + d
     # positive diagonal
     for x in range(boardLength-5):
         for y in range(boardLength-5):
@@ -187,11 +220,17 @@ def heuristic2(board, player):
             if pieces[0] == 0 and pieces[5] == 0 and pieces[1:5].count(player) == 3 and 0 in pieces[1:5]:
                 d = pieces.index(0, 1, -1)
                 return x + d, y + d
+            if pieces[0] == 0 and pieces[5] == 0 and pieces[1:5].count(opp) == 3 and 0 in pieces[1:5]:
+                d = pieces.index(0, 1, -1)
+                return x + d, y + d
     # oblique diagonal
     for x in range(boardLength-5):
         for y in range(5, boardLength):
             pieces = tuple(board[x+d][y-d] for d in range(6))
             if pieces[0] == 0 and pieces[5] == 0 and pieces[1:5].count(player) == 3 and 0 in pieces[1:5]:
+                d = pieces.index(0, 1, -1)
+                return x + d, y - d
+            if pieces[0] == 0 and pieces[5] == 0 and pieces[1:5].count(opp) == 3 and 0 in pieces[1:5]:
                 d = pieces.index(0, 1, -1)
                 return x + d, y - d
     return None
@@ -278,6 +317,7 @@ def heuristic2_op(board, player):
 def heuristic3(board, player):
     # heuristic for 'double four', 'one four one three' and 'double three'
     boardLength = len(board)
+    opp = 3 - player
     # possible placement to achieve four
     # column
     col4 = set()
@@ -285,6 +325,10 @@ def heuristic3(board, player):
         for y in range(boardLength):
             pieces = tuple(board[x + d][y] for d in range(5))
             if pieces.count(0) == 2 and pieces.count(player) == 3:
+                for d in range(5):
+                    if pieces[d] == 0:
+                        col4.add((x + d, y))
+            if pieces.count(0) == 2 and pieces.count(opp) == 3:
                 for d in range(5):
                     if pieces[d] == 0:
                         col4.add((x + d, y))
@@ -297,6 +341,10 @@ def heuristic3(board, player):
                 for d in range(5):
                     if pieces[d] == 0:
                         row4.add((x, y + d))
+            if pieces.count(0) == 2 and pieces.count(opp) == 3:
+                for d in range(5):
+                    if pieces[d] == 0:
+                        row4.add((x, y + d))
     # positive diagonal
     pos4 = set()
     for x in range(boardLength - 4):
@@ -306,12 +354,20 @@ def heuristic3(board, player):
                 for d in range(5):
                     if pieces[d] == 0:
                         pos4.add((x + d, y + d))
+            if pieces.count(0) == 2 and pieces.count(opp) == 3:
+                for d in range(5):
+                    if pieces[d] == 0:
+                        pos4.add((x + d, y + d))
     # oblique diagonal
     ob4 = set()
     for x in range(boardLength - 4):
         for y in range(4, boardLength):
             pieces = tuple(board[x + d][y - d] for d in range(5))
             if pieces.count(0) == 2 and pieces.count(player) == 3:
+                for d in range(5):
+                    if pieces[d] == 0:
+                        ob4.add((x + d, y - d))
+            if pieces.count(0) == 2 and pieces.count(opp) == 3:
                 for d in range(5):
                     if pieces[d] == 0:
                         ob4.add((x + d, y - d))
@@ -326,12 +382,20 @@ def heuristic3(board, player):
                 for d in range(1, 5):
                     if pieces[d] == 0:
                         col3.add((x + d, y))
+            if pieces[0] == 0 and pieces[5] == 0 and pieces[1:5].count(opp) == 2 and pieces[1:5].count(0) == 2:
+                for d in range(1, 5):
+                    if pieces[d] == 0:
+                        col3.add((x + d, y))
     # row
     row3 = set()
     for x in range(boardLength):
         for y in range(boardLength - 5):
             pieces = tuple(board[x][y + d] for d in range(6))
             if pieces[0] == 0 and pieces[5] == 0 and pieces[1:5].count(player) == 2 and pieces[1:5].count(0) == 2:
+                for d in range(1, 5):
+                    if pieces[d] == 0:
+                        row3.add((x, y + d))
+            if pieces[0] == 0 and pieces[5] == 0 and pieces[1:5].count(opp) == 2 and pieces[1:5].count(0) == 2:
                 for d in range(1, 5):
                     if pieces[d] == 0:
                         row3.add((x, y + d))
@@ -344,12 +408,20 @@ def heuristic3(board, player):
                 for d in range(1, 5):
                     if pieces[d] == 0:
                         pos3.add((x + d, y + d))
+            if pieces[0] == 0 and pieces[5] == 0 and pieces[1:5].count(opp) == 2 and pieces[1:5].count(0) == 2:
+                for d in range(1, 5):
+                    if pieces[d] == 0:
+                        pos3.add((x + d, y + d))
     # oblique diagonal
     ob3 = set()
     for x in range(boardLength - 5):
         for y in range(5, boardLength):
             pieces = tuple(board[x + d][y - d] for d in range(6))
             if pieces[0] == 0 and pieces[5] == 0 and pieces[1:5].count(player) == 2 and pieces[1:5].count(0) == 2:
+                for d in range(1, 5):
+                    if pieces[d] == 0:
+                        ob3.add((x + d, y - d))
+            if pieces[0] == 0 and pieces[5] == 0 and pieces[1:5].count(opp) == 2 and pieces[1:5].count(0) == 2:
                 for d in range(1, 5):
                     if pieces[d] == 0:
                         ob3.add((x + d, y - d))

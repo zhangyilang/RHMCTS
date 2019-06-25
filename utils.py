@@ -192,18 +192,18 @@ def class_to_score():
     score_map = {"WIN": 200000,
                  "H4": 10000,
                  "C4": 1000,
-                 "H3": 500,
-                 "M3": 200,
-                 "H2": 50,
-                 "M2": 30,
-                 "S4": 20,
-                 "S3": 5,
-                 "S2": -10
+                 "H3": 1000,
+                 "M3": 500,
+                 "H2": 300,
+                 "M2": 100,
+                 "S4": 50,
+                 "S3": 20,
+                 "S2": 0
                  }
     return score_map
 
 
-def board_evaluation(board):
+def board_evaluation(board, player):
     """
     evaluate the situation of the brain.
     :param
@@ -213,11 +213,12 @@ def board_evaluation(board):
     """
     score = 0
 
-    brain_board = extend_board(board=board, player=1)
+    brain_board = extend_board(board=board, player=player)
     for a_class, num in is_special_class(brain_board, 1).items():
         score = score + class_to_score()[a_class] * num
 
-    oppo_board = extend_board(board=board, player=2)
+    opp = 3 - player
+    oppo_board = extend_board(board=board, player=opp)
     for a_class, num in is_special_class(oppo_board, 2).items():
         score = score - class_to_score()[a_class] * num
 
