@@ -47,7 +47,7 @@ def policy_evaluation_function(state):
         sub.append((coord, score_new))
 
     # choose the 5 sub-state with the highest scores
-    sub = sorted(sub, key=lambda x: x[1], reverse=True)[:5]
+    sub = sorted(sub, key=lambda x: x[1], reverse=True)[:3]
 
     # normalization
     sub_norm = []
@@ -98,25 +98,33 @@ def simulation_policy(state):
     action = heuristic1(board, player)
     if action is not None:
         return action
-    action = heuristic1(board, opponent)
-    if action is not None:
-        return action
+    # action = heuristic1(board, opponent)
+    # if action is not None:
+    #     return action
+    #
+    # action = heuristic2(board, player)
+    # if action is not None:
+    #     return action
+    # action = heuristic2(board, opponent)
+    # if action is not None:
+    #     return action
+    #
+    # action = heuristic3(board, player)
+    # if action is not None:
+    #     return action
+    # action = heuristic3(board, opponent)
+    # if action is not None:
+    #     return action
 
-    action = heuristic2(board, player)
-    if action is not None:
-        return action
-    action = heuristic2(board, opponent)
-    if action is not None:
-        return action
+    moved = []
+    for i in range(20):
+        for j in range(20):
+            if board[i][j] > 0:
+                moved.append((i, j))
+    adjacent = adjacent_moves(moved)  # get the adjacent of the moved
+    actions = list(set(adjacent) - set(moved))
 
-    action = heuristic3(board, player)
-    if action is not None:
-        return action
-    action = heuristic3(board, opponent)
-    if action is not None:
-        return action
-
-    actions = simulation_evaluation_function(state)
+    # actions = simulation_evaluation_function(state)
     return choice(actions)
 
 
