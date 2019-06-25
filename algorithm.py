@@ -190,6 +190,10 @@ class RHMCTS(object):
         else:
             self.root = TreeNode(None, 1.0)
 
+    def print_Board(self, board):
+        for i in range(20):
+            print(board[i])
+
     # def updata_adjacent(self, moved, adjacent_ori, action):
     #     h, w = action
     #     width = 20
@@ -230,12 +234,41 @@ class RHMCTSPlayer(object):
 # test
 if __name__ == "__main__":
     test_board = [[0 for i in range(20)] for j in range(20)]
-    test_board[6][10] = 1
-    test_board[6][9] = 1
-    test_board[6][5] = 2
-    test_board[7][5] = 1
-    test_board[19][5] = 2
+    test_board[3][1] = 1
+    test_board[2][2] = 2
+    test_board[1][3] = 1
+    test_board[9][9] = 2
+    test_board[10][10] = 2
+    test_board[3][1] = 1
+    test_board[1][4] = 2
+    test_board[1][1] = 1
+    test_board[1][2] = 1
+    test_board[4][1] = 1
+    test_board[2][1] = 2
+
     player1 = RHMCTSPlayer()
-    time1 = time.time()
-    print(player1.get_action(test_board, time1 + 15))
-    print(time.time() - time1)
+    # time1 = time.time()
+    # print(player1.get_action(test_board, time1 + 15))
+    # print(time.time() - time1)
+    player1.rhmcts.print_Board(test_board)
+    while (True):
+        print('================')
+        time1 = time.time()
+        x, y = player1.get_action(test_board, time1 + 15)
+        print("the new move is ({},{})".format(x, y))
+        if player1.rhmcts.isTerminal(test_board, x, y, 1):
+            print('AI wins!')
+            break
+        test_board[x][y] = 1
+        player1.rhmcts.print_Board(test_board)
+        player1.rhmcts.update_with_move((x, y))
+
+        move = input('your move:')
+        x, y = move.strip().split(',')
+        x = int(x)
+        y = int(y)
+        test_board[x][y] = 2
+        if player1.rhmcts.isTerminal(test_board, x, y, 1):
+            print('AI wins!')
+            break
+        player1.rhmcts.print_Board(test_board)
