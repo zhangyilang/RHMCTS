@@ -87,6 +87,7 @@ class RHMCTS(object):
                     new_board = deepcopy(board)
                     new_board[act[0]][act[1]] = player
                     winner = self.simulate((new_board, opponent))   # 0 for a tie, 1 for P1, 2 for P2
+                    print(winner)
                     # backpropagation
                     leaf_value = -1 if winner == opponent else winner
                     # print(act)
@@ -172,17 +173,20 @@ class RHMCTS(object):
         if action is not None:
             return action
 
-        if time_end == -1:
-            actions = policy_evaluation_function((board, 1)) if self.root.is_leaf() else self.root.children.items()
-            return max(actions, key=lambda x: x[1])[0]
+        actions = policy_evaluation_function((board, 1))
+        return max(actions, key=lambda x: x[1])[0]
 
-        for n in range(self.num_simu):
-            if time.time() > time_end:
-                break
-            state_copy = deepcopy((board, 1))  # we are player 1
-            self.playout(state_copy)
-        # print(self.root.children.items())
-        return max(self.root.children.items(), key=lambda x: x[1].Q)[0]
+        # if time_end == -1:
+        #     actions = policy_evaluation_function((board, 1))
+        #     return max(actions, key=lambda x: x[1])[0]
+
+        # for n in range(self.num_simu):
+        #     if time.time() > time_end:
+        #         break
+        #     state_copy = deepcopy((board, 1))  # we are player 1
+        #     self.playout(state_copy)
+        # # print(self.root.children.items())
+        # return max(self.root.children.items(), key=lambda x: x[1].Q)[0]
 
     def update_with_move(self, last_move):
         # self.moved.append(last_move)
@@ -237,34 +241,44 @@ class RHMCTSPlayer(object):
 # test
 if __name__ == "__main__":
     test_board = [[0 for i in range(20)] for j in range(20)]
-    test_board[0][8] = 1
-    test_board[0][9] = 1
-    test_board[1][10] = 1
-    test_board[2][10] = 1
+    test_board[1][1] = 1
+    test_board[2][2] = 2
+    # test_board[3][3] = 2
+    # test_board[4][4] = 2
+    test_board[4][5] = 2
+    test_board[2][1] = 2
+    test_board[3][5] = 2
+    test_board[4][2] = 2
+    test_board[4][1] = 1
+    test_board[3][1] = 1
+    test_board[4][6] = 1
     # test_board[2][9] = 1
     player1 = RHMCTSPlayer()
     # time1 = time.time()
     # print(player1.get_action(test_board, time1 + 15))
     # print(time.time() - time1)
+    time1 = time.time()
     player1.rhmcts.print_Board(test_board)
-    while (True):
-        print('================')
-        time1 = time.time()
-        x, y = player1.get_action(test_board, time1 + 15)
-        print("the new move is ({},{})".format(x, y))
-        if player1.rhmcts.isTerminal(test_board, x, y, 1):
-            print('AI wins!')
-            break
-        test_board[x][y] = 1
-        player1.rhmcts.print_Board(test_board)
-        player1.rhmcts.update_with_move((x, y))
-
-        move = input('your move:')
-        x, y = move.strip().split(',')
-        x = int(x)
-        y = int(y)
-        test_board[x][y] = 2
-        if player1.rhmcts.isTerminal(test_board, x, y, 1):
-            print('AI wins!')
-            break
-        player1.rhmcts.print_Board(test_board)
+    print(player1.get_action(test_board, time1 + 5))
+    print(time.time() - time1)
+    # while (True):
+    #     print('================')
+    #     time1 = time.time()
+    #     x, y = player1.get_action(test_board, time1 + 15)
+    #     print("the new move is ({},{})".format(x, y))
+    #     if player1.rhmcts.isTerminal(test_board, x, y, 1):
+    #         print('AI wins!')
+    #         break
+    #     test_board[x][y] = 1
+    #     player1.rhmcts.print_Board(test_board)
+    #     player1.rhmcts.update_with_move((x, y))
+    #
+    #     move = input('your move:')
+    #     x, y = move.strip().split(',')
+    #     x = int(x)
+    #     y = int(y)
+    #     test_board[x][y] = 2
+    #     if player1.rhmcts.isTerminal(test_board, x, y, 1):
+    #         print('AI wins!')
+    #         break
+    #     player1.rhmcts.print_Board(test_board)
