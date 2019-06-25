@@ -46,7 +46,7 @@ class TreeNode(object):
 
 
 class RHMCTS(object):
-    def __init__(self, policy_value_fn, c_puct=5, max_depth=10):
+    def __init__(self, policy_value_fn, c_puct=5, max_depth=5):
         """
         :param policy_value_fn: a function that takes in a board state and outputs
             a list of (action, probability) tuples and also a score in [-1, 1]
@@ -64,7 +64,7 @@ class RHMCTS(object):
         # self.moved = []
         # self.adjancent = []
 
-    def playout(self, state, num_simu=5):
+    def playout(self, state, num_simu=3):
         board, player = state
         node = self.root
 
@@ -160,7 +160,7 @@ class RHMCTS(object):
         action = heuristic2(board, 1)
         if action is not None:
             return action
-        action = heuristic2(board, 2)
+        action = heuristic2_op(board, 2)
         if action is not None:
             return action
         action = heuristic3(board, 1)
@@ -221,7 +221,7 @@ class RHMCTS(object):
 
 
 class RHMCTSPlayer(object):
-    def __init__(self, policy_evaluation_fn=policy_evaluation_function, c_puct=5, max_depth=5):
+    def __init__(self, policy_evaluation_fn=policy_evaluation_function, c_puct=5, max_depth=4):
         self.rhmcts = RHMCTS(policy_evaluation_fn, c_puct, max_depth)
 
     def get_action(self, board, time_limit):

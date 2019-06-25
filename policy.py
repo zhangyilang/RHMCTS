@@ -197,6 +197,84 @@ def heuristic2(board, player):
     return None
 
 
+def heuristic2_op(board, player):
+    # heuristic for 3 pieces in a line
+    boardLength = len(board)
+    # column
+    for x in range(boardLength-5):
+        for y in range(boardLength):
+            pieces = tuple(board[x+d][y] for d in range(6))
+            if pieces[0] == 0 and pieces[5] == 0 and pieces[1:5].count(player) == 3 and 0 in pieces[1:5]:
+                d = pieces.index(0, 1, -1)
+                actions = [(x, y), (x + 4, y)] if d == 4 else [(x + 1, y), (x + 5, y)] if d == 1 \
+                           else [(x, y), (x + d, y), (x + 5, y)]
+                max_s = 0
+                max_act = None
+                for act_x, act_y in actions:
+                    board[act_x][act_y] = player
+                    score = board_evaluation(board, player)
+                    board[act_x][act_y] = 0
+                    if score > max_s:
+                        max_s = score
+                        max_act = (act_x, act_y)
+                return max_act
+    # row
+    for x in range(boardLength):
+        for y in range(boardLength-5):
+            pieces = tuple(board[x][y+d] for d in range(6))
+            if pieces[0] == 0 and pieces[5] == 0 and pieces[1:5].count(player) == 3 and 0 in pieces[1:5]:
+                d = pieces.index(0, 1, -1)
+                actions = [(x, y), (x, y + 4)] if d == 4 else [(x, y + 1), (x, y + 5)] if d == 1 \
+                    else [(x, y), (x, y + d), (x, y + 5)]
+                max_s = 0
+                max_act = None
+                for act_x, act_y in actions:
+                    board[act_x][act_y] = player
+                    score = board_evaluation(board, player)
+                    board[act_x][act_y] = 0
+                    if score > max_s:
+                        max_s = score
+                        max_act = (act_x, act_y)
+                return max_act
+    # positive diagonal
+    for x in range(boardLength-5):
+        for y in range(boardLength-5):
+            pieces = tuple(board[x+d][y+d] for d in range(6))
+            if pieces[0] == 0 and pieces[5] == 0 and pieces[1:5].count(player) == 3 and 0 in pieces[1:5]:
+                d = pieces.index(0, 1, -1)
+                actions = [(x, y), (x + 4, y + 4)] if d == 4 else [(x + 1, y + 1), (x + 5, y + 5)] if d == 1 \
+                    else [(x, y), (x + d, y + d), (x + 5, y + 5)]
+                max_s = 0
+                max_act = None
+                for act_x, act_y in actions:
+                    board[act_x][act_y] = player
+                    score = board_evaluation(board, player)
+                    board[act_x][act_y] = 0
+                    if score > max_s:
+                        max_s = score
+                        max_act = (act_x, act_y)
+                return max_act
+    # oblique diagonal
+    for x in range(boardLength-5):
+        for y in range(5, boardLength):
+            pieces = tuple(board[x+d][y-d] for d in range(6))
+            if pieces[0] == 0 and pieces[5] == 0 and pieces[1:5].count(player) == 3 and 0 in pieces[1:5]:
+                d = pieces.index(0, 1, -1)
+                actions = [(x, y), (x + 4, y - 4)] if d == 4 else [(x + 1, y - 1), (x + 5, y - 5)] if d == 1 \
+                    else [(x, y), (x + d, y - d), (x + 5, y - 5)]
+                max_s = 0
+                max_act = None
+                for act_x, act_y in actions:
+                    board[act_x][act_y] = player
+                    score = board_evaluation(board, player)
+                    board[act_x][act_y] = 0
+                    if score > max_s:
+                        max_s = score
+                        max_act = (act_x, act_y)
+                return max_act
+    return None
+
+
 def heuristic3(board, player):
     # heuristic for 'double four', 'one four one three' and 'double three'
     boardLength = len(board)
