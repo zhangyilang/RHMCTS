@@ -370,6 +370,7 @@ def heuristic3(board, player):
     sets = [col4, row4, pos4, ob4, col3, row3, pos3, ob3]
     for i in range(8):
         for j in range(i+1, 8):
-            intersect = sets[i] & sets[j]
-            if len(intersect) != 0:
-                return list(intersect)[0]
+            if j != i+4:
+                intersect = sets[i] & sets[j]
+                if len(intersect) != 0:
+                    return list(intersect)[0]

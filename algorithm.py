@@ -268,65 +268,78 @@ def get_action_fast_version(board):
     adjacent = adjacent_2_moves(moved)
 
     for x, y in adjacent:
-        actions = []
         board[x][y] = 1
-        action = heuristic1(board, 1)
-        if action is not None:
-            actions.append(action)
-        action = heuristic2_op(board, 1)
-        if action is not None:
-            actions.append(action)
-        action = heuristic3(board, 1)
-        if action is not None:
-            actions.append(action)
-
-        if len(actions) != 0:
-            for x0, y0 in actions:
-                board[x0][y0] = 2
-                if heuristic3(board, 1) is not None:
-                    return x, y
-                board[x0][y0] = 0
+        if find_kill(board, 1, 1) is True:
+            return x, y
         board[x][y] = 0
 
     for x, y in adjacent:
-        actions = []
         board[x][y] = 2
-        action = heuristic1(board, 2)
-        if action is not None:
-            actions.append(action)
-        action = heuristic2_op(board, 2)
-        if action is not None:
-            actions.append(action)
-        action = heuristic3(board, 2)
-        if action is not None:
-            actions.append(action)
-
-        if len(actions) != 0:
-            for x0, y0 in actions:
-                board[x0][y0] = 1
-                if heuristic3(board, 2) is not None:
-                    return x, y
-                board[x0][y0] = 0
+        if find_kill(board, 2, 1) is True:
+            return x, y
         board[x][y] = 0
 
     actions = policy_evaluation_function((board, 1))
     return max(actions, key=lambda x: x[1])[0]
 
 
+def find_kill(board, player, depth):
+    if depth <= 0:
+        return False
+
+    op = 3 - player
+    action = heuristic1(board, player)
+    if action is None:
+        action = heuristic2_op(board, player)
+    if action is None:
+        return False
+
+    if action is not None:
+        x0, y0 = action
+        board[x0][y0] = op
+        if heuristic1(board, player) is not None:
+            return True
+        if heuristic2(board, player) is not None:
+            return True
+
+        moved = []
+        k = len(board)
+        for i in range(k):
+            for j in range(k):
+                if board[i][j] != 0:
+                    moved.append((i, j))
+        adjacent = adjacent_2_moves(moved)
+        for x, y in adjacent:
+            board[x][y] = player
+            if find_kill(board, player, depth-1) is True:
+                return True
+            board[x][y] = 0
+        board[x0][y0] = 0
+    return False
+
+
 # test
 if __name__ == "__main__":
     test_board = [[0 for i in range(20)] for j in range(20)]
-    test_board[0][7] = 1
-    test_board[0][8] = 2
-    test_board[0][9] = 2
-    test_board[0][10] = 2
-    test_board[0][11] = 2
-    test_board[0][12] = 1
-    test_board[1][8] = 1
-    test_board[1][9] = 1
-    test_board[2][9] = 1
-    test_board[4][9] = 2
-    test_board[6][9] = 2
+    test_board[10][1] = 2
+    test_board[9][2] = 2
+    test_board[8][2] = 2
+    test_board[9][3] = 1
+    test_board[10][4] = 1
+    test_board[11][4] = 2
+    test_board[9][5] = 1
+    test_board[11][5] = 1
+    test_board[12][5] = 2
+    test_board[10][6] = 2
+    test_board[11][6] = 1
+    test_board[13][6] = 1
+    test_board[11][7] = 2
+    test_board[12][7] = 1
+    test_board[11][8] = 1
+    test_board[13][8] = 2
+    test_board[10][9] = 2
+    for i in range(20):
+        print(test_board[i])
     print(get_action_fast_version(test_board))
     # time1 = time.time()
     # print(player1.get_action(test_board, time1 + 15))
