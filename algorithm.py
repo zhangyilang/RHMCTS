@@ -60,7 +60,7 @@ class RHMCTS(object):
         self.root = TreeNode(None, 1.0)
         self.policy = policy_value_fn
         self.c_puct = c_puct
-        self.num_simu = max_depth
+        self.max_depth = max_depth
         # self.moved = []
         # self.adjancent = []
 
@@ -82,8 +82,8 @@ class RHMCTS(object):
             node.expand(action_prob)
             # simulation
             opponent = 1 if player == 2 else 2    # switch player
-            for act, _ in action_prob:
-                for i in range(num_simu):
+            for i in range(num_simu):
+                for act, _ in action_prob:
                     new_board = deepcopy(board)
                     new_board[act[0]][act[1]] = player
                     winner = self.simulate((new_board, opponent))   # 0 for a tie, 1 for P1, 2 for P2
@@ -173,20 +173,20 @@ class RHMCTS(object):
         if action is not None:
             return action
 
-        actions = policy_evaluation_function((board, 1))
-        return max(actions, key=lambda x: x[1])[0]
+        # actions = policy_evaluation_function((board, 1))
+        # return max(actions, key=lambda x: x[1])[0]
 
-        # if time_end == -1:
-        #     actions = policy_evaluation_function((board, 1))
-        #     return max(actions, key=lambda x: x[1])[0]
+        if time_end == -1:
+            actions = policy_evaluation_function((board, 1))
+            return max(actions, key=lambda x: x[1])[0]
 
-        # for n in range(self.num_simu):
-        #     if time.time() > time_end:
-        #         break
-        #     state_copy = deepcopy((board, 1))  # we are player 1
-        #     self.playout(state_copy)
-        # # print(self.root.children.items())
-        # return max(self.root.children.items(), key=lambda x: x[1].Q)[0]
+        for n in range(self.max_depth):
+            state_copy = deepcopy((board, 1))  # we are player 1
+            self.playout(state_copy)
+            if time.time() > time_end:
+                break
+        # print(self.root.children.items())
+        return max(self.root.children.items(), key=lambda x: x[1].Q)[0]
 
     def update_with_move(self, last_move):
         # self.moved.append(last_move)
@@ -228,7 +228,7 @@ class RHMCTS(object):
 
 
 class RHMCTSPlayer(object):
-    def __init__(self, policy_evaluation_fn=policy_evaluation_function, c_puct=5, max_depth=4):
+    def __init__(self, policy_evaluation_fn=policy_evaluation_function, c_puct=5, max_depth=1):
         self.rhmcts = RHMCTS(policy_evaluation_fn, c_puct, max_depth)
 
     def get_action(self, board, time_limit):
@@ -238,29 +238,99 @@ class RHMCTSPlayer(object):
         return action
 
 
+def get_action_fast_version(board):
+    action = heuristic1(board, 1)
+    if action is not None:
+        return action
+    action = heuristic1(board, 2)
+    if action is not None:
+        return action
+    action = heuristic2(board, 1)
+    if action is not None:
+        return action
+    action = heuristic2_op(board, 2)
+    if action is not None:
+        return action
+    action = heuristic3(board, 1)
+    if action is not None:
+        return action
+    action = heuristic3(board, 2)
+    if action is not None:
+        return action
+
+    moved = []
+    k = len(board)
+    for i in range(k):
+        for j in range(k):
+            if board[i][j] != 0:
+                moved.append((i, j))
+
+    adjacent = adjacent_2_moves(moved)
+
+    for x, y in adjacent:
+        actions = []
+        board[x][y] = 1
+        action = heuristic1(board, 1)
+        if action is not None:
+            actions.append(action)
+        action = heuristic2_op(board, 1)
+        if action is not None:
+            actions.append(action)
+        action = heuristic3(board, 1)
+        if action is not None:
+            actions.append(action)
+
+        if len(actions) != 0:
+            for x0, y0 in actions:
+                board[x0][y0] = 2
+                if heuristic3(board, 1) is not None:
+                    return x, y
+                board[x0][y0] = 0
+        board[x][y] = 0
+
+    for x, y in adjacent:
+        actions = []
+        board[x][y] = 2
+        action = heuristic1(board, 2)
+        if action is not None:
+            actions.append(action)
+        action = heuristic2_op(board, 2)
+        if action is not None:
+            actions.append(action)
+        action = heuristic3(board, 2)
+        if action is not None:
+            actions.append(action)
+
+        if len(actions) != 0:
+            for x0, y0 in actions:
+                board[x0][y0] = 1
+                if heuristic3(board, 2) is not None:
+                    return x, y
+                board[x0][y0] = 0
+        board[x][y] = 0
+
+    actions = policy_evaluation_function((board, 1))
+    return max(actions, key=lambda x: x[1])[0]
+
+
 # test
 if __name__ == "__main__":
     test_board = [[0 for i in range(20)] for j in range(20)]
-    test_board[1][1] = 1
-    test_board[2][2] = 2
-    # test_board[3][3] = 2
-    # test_board[4][4] = 2
-    test_board[4][5] = 2
-    test_board[2][1] = 2
-    test_board[3][5] = 2
-    test_board[4][2] = 2
-    test_board[4][1] = 1
-    test_board[3][1] = 1
-    test_board[4][6] = 1
-    # test_board[2][9] = 1
-    player1 = RHMCTSPlayer()
+    test_board[0][7] = 1
+    test_board[0][8] = 2
+    test_board[0][9] = 2
+    test_board[0][10] = 2
+    test_board[0][11] = 2
+    test_board[0][12] = 1
+    test_board[1][8] = 1
+    test_board[1][9] = 1
+    test_board[2][9] = 1
+    test_board[4][9] = 2
+    test_board[6][9] = 2
+    print(get_action_fast_version(test_board))
     # time1 = time.time()
     # print(player1.get_action(test_board, time1 + 15))
     # print(time.time() - time1)
-    time1 = time.time()
-    player1.rhmcts.print_Board(test_board)
-    print(player1.get_action(test_board, time1 + 5))
-    print(time.time() - time1)
     # while (True):
     #     print('================')
     #     time1 = time.time()

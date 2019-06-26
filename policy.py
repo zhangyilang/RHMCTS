@@ -17,7 +17,7 @@ def policy_evaluation_function(state):
                 moved.append((i, j))
 
     substate = []
-    adjacent = adjacent_moves(moved)  # get the adjacent of the moved
+    adjacent = adjacent_2_moves(moved)  # get the adjacent of the moved
 
     # suppose the coordinates in the adjacent have been placed by chess piece
     # moved = moved + adjacent_eight
@@ -49,7 +49,7 @@ def policy_evaluation_function(state):
     #     sub.append((coord, score_new))
 
     # choose the 5 sub-state with the highest scores
-    sub = sorted(substate, key=lambda x: x[1], reverse=True)[:3]
+    sub = sorted(substate, key=lambda x: x[1], reverse=True)[:2]
     # print(sub)
 
     # normalization

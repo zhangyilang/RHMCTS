@@ -2,14 +2,15 @@ import time
 import pisqpipe as pp
 from pisqpipe import DEBUG_EVAL, DEBUG
 import algorithm
+from copy import deepcopy
 
 
 pp.infotext = 'name="HMCTS", author="ElenZhang", version="1.0", country="China", www="https://github.com/zhangyilang/mdpwithmcts"'
 
 MAX_BOARD = 100
 board = [[0 for i in range(MAX_BOARD)] for j in range(MAX_BOARD)]
-player = algorithm.RHMCTSPlayer()
-stepcount = None
+# player = algorithm.RHMCTSPlayer()
+# stepcount = None
 
 
 def brain_init():
@@ -39,7 +40,7 @@ def brain_my(x, y):
     if isFree(x, y):
         board[x][y] = 1
         # update RHMCT
-        player.rhmcts.update_with_move((x, y))
+        # player.rhmcts.update_with_move((x, y))
     else:
         pp.pipeOut("ERROR my move [{},{}]".format(x, y))
 
@@ -48,7 +49,7 @@ def brain_opponents(x, y):
     if isFree(x, y):
         board[x][y] = 2
         # update RHMCT
-        player.rhmcts.update_with_move((x, y))
+        # player.rhmcts.update_with_move((x, y))
     else:
         pp.pipeOut("ERROR opponents's move [{},{}]".format(x, y))
 
@@ -68,20 +69,22 @@ def brain_takeback(x, y):
 
 
 def brain_turn():
-    time_start = time.time()
+    # time_start = time.time()
     if pp.terminateAI:
         return
-    global stepcount
-    if stepcount is None:
-        stepcount = 0
-        for i in range(len(board)):
-            for j in range(len(board)):
-                if board[i][j] == 1:
-                    stepcount += 1
-    time_limit = 5 + time_start if stepcount > 3 else -1
-    (x, y) = player.get_action(board, time_limit)
+    # global stepcount
+    # if stepcount is None:
+    #     stepcount = 0
+    #     for i in range(len(board)):
+    #         for j in range(len(board)):
+    #             if board[i][j] == 1:
+    #                 stepcount += 1
+    # time_limit = 5 + time_start if stepcount > 3 else -1
+    # (x, y) = player.get_action(board, time_limit)
+    board_copy = deepcopy(board)
+    x, y = algorithm.get_action_fast_version(board_copy)
     pp.do_mymove(x, y)
-    stepcount += 1
+    # stepcount += 1
 
 
 def brain_end():
