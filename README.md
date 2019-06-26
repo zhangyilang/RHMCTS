@@ -118,6 +118,9 @@ We use the Monte Carlo Tree Search as our basic algorithm. And based the alogrit
 ### Reference
 
 [1] Jun Hwan Kang,Hang Joon Kim, Effective Monte-Carlo Tree Search Strategies for Gomoku AI, IJCTA, 9(10), 2016, pp. 4833-4841
+
 [2] Junru Wanga, Lan Huangb,Evolving Gomoku Solver by Genetic Algorithm,IEEE WARTIA,2014
+
 [3] JINXING XIE and JIEFANG DONG,Heuristic Genetic Algorithms for General Capacitated Lot-Sizing Problems,2001
+
 [4] Louis Victor Allis,Searching for Solutions in Games and Articial Intelligence,Version 8.0 of July 1, 1994
