@@ -87,13 +87,15 @@ If the next move can not lead to the fatal move, we need use this function to fi
 
 No matter what the possible domain of the next move will be, it is necessary to design our heuristic function to evaluate how the situation will change after the next move. Thus we can know what's is the optimal move from the possible domain.
 
+
+
 **6. Point evaluation**
 
 As mentioned above, we need to know the performance of the next move. With the score function, we check the four directions (row, line, positive diagonal, oblique diagonal) of the new move and score the line if it satisfies certain patterns and sum the respective scores as the total score of the new move. 
 
 <img src="/images/point.png" style='zoom:80%'>
 
-And the patterns are external knowledge we collect from some Blogs. Thanks to the limited number of the patterns, we can use dictionary to store them. 
+And the patterns are external knowledge we collect from some Blogs. Thanks to the limited number of the patterns, we can use a dictionary to store them. 
 
 <img src="/images/table.png" style='zoom:80%'>
 
