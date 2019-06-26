@@ -87,7 +87,7 @@ If the next move can not lead to the fatal move, we need use this function to fi
 
 No matter what the possible domain of the next move will be, it is necessary to design our heuristic function to evaluate how the situation will change after the next move. Thus we can know what's is the optimal move from the possible domain.
 
-**Point evaluation**
+**6. Point evaluation**
 
 As mentioned above, we need to know the performance of the next move. With the score function, we check the four directions (row, line, positive diagonal, oblique diagonal) of the new move and score the line if it satisfies certain patterns and sum the respective scores as the total score of the new move. 
 
@@ -99,7 +99,7 @@ And the patterns are external knowledge we collect from some Blogs. Thanks to th
 
 
 
-**Board evaluation**
+**7. Board evaluation**
 
 with point evaluation method, we can evaluate the whole board by sum of the scores of each piece. And we know we must prevent the opponent to win while we are trying to get 5 our pieces in one row. So board evaluation scores should include the defend scores and the attack scores. We use the score of the current player minus the score of the opponent to represent the total score.
 $$
@@ -109,13 +109,13 @@ When we get the scores for each candidate in the possible domain, we can give th
 
 
 
-##### 6. Conclusion
+### Conclusion
 
 We use the Monte Carlo Tree Search as our basic algorithm. And based the alogrithm, we proposed some fatal move patterns. So if we will win or loss at the next move, we will make us win or block the opponent. If we can not win or loss in the next move. We must find a place can help us win. We use the board evaluation function to evaluate the board after the possible next move. And we use greedy policy to find the candidates with the highest score. And the simulation part will simulate the next 20 steps for several times and find if we can win. Then we get a simulation score from the simulation part. The expansion part will balance the evaluation score and the simulation score to find the optimal move.
 
 
 
-##### Reference
+### Reference
 
 [1] Jun Hwan Kang,Hang Joon Kim, Effective Monte-Carlo Tree Search Strategies for Gomoku AI, IJCTA, 9(10), 2016, pp. 4833-4841
 [2] Junru Wanga, Lan Huangb,Evolving Gomoku Solver by Genetic Algorithm,IEEE WARTIA,2014
