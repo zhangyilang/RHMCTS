@@ -269,13 +269,13 @@ def get_action_fast_version(board):
 
     for x, y in adjacent:
         board[x][y] = 1
-        if find_kill(board, 1, 1) is True:
+        if find_kill(board, 1, 2) is True:
             return x, y
         board[x][y] = 0
 
     for x, y in adjacent:
         board[x][y] = 2
-        if find_kill(board, 2, 1) is True:
+        if find_kill(board, 2, 2) is True:
             return x, y
         board[x][y] = 0
 
