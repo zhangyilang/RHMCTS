@@ -239,6 +239,7 @@ class RHMCTSPlayer(object):
 
 
 def get_action_fast_version(board):
+    time_limit = time.time() + 5
     action = heuristic1(board, 1)
     if action is not None:
         return action
@@ -269,13 +270,13 @@ def get_action_fast_version(board):
 
     for x, y in adjacent:
         board[x][y] = 1
-        if find_kill(board, 1, 2) is True:
+        if find_kill(board, 1, 2, time_limit) is True:
             return x, y
         board[x][y] = 0
 
     for x, y in adjacent:
         board[x][y] = 2
-        if find_kill(board, 2, 2) is True:
+        if find_kill(board, 2, 2, time_limit) is True:
             return x, y
         board[x][y] = 0
 
@@ -283,8 +284,10 @@ def get_action_fast_version(board):
     return max(actions, key=lambda x: x[1])[0]
 
 
-def find_kill(board, player, depth):
+def find_kill(board, player, depth, time_limit):
     if depth <= 0:
+        return False
+    if time.time() > time_limit:
         return False
 
     op = 3 - player
@@ -310,8 +313,10 @@ def find_kill(board, player, depth):
                     moved.append((i, j))
         adjacent = adjacent_2_moves(moved)
         for x, y in adjacent:
+            if time.time() > time_limit:
+                return False
             board[x][y] = player
-            if find_kill(board, player, depth-1) is True:
+            if find_kill(board, player, depth-1, time_limit) is True:
                 return True
             board[x][y] = 0
         board[x0][y0] = 0
