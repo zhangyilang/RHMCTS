@@ -6,7 +6,9 @@ Final project of FDU DATA130008, AI (artificial intelligence) in 2019 spring sem
 
 Group members: 张奕朗, 谢炳辉.
 
-Algorithm: Restricted Heuristic Monte Carlo Tree Search.
+RHMCTS : Restricted Heuristic Monte Carlo Tree Search.
+
+
 
 ### Basic ideas
 
@@ -89,7 +91,7 @@ No matter what the possible domain of the next move will be, it is necessary to 
 
 
 
-**6. Point evaluation**
+##### 6. Point evaluation
 
 As mentioned above, we need to know the performance of the next move. With the score function, we check the four directions (row, line, positive diagonal, oblique diagonal) of the new move and score the line if it satisfies certain patterns and sum the respective scores as the total score of the new move. 
 
@@ -101,7 +103,7 @@ And the patterns are external knowledge we collect from some Blogs. Thanks to th
 
 
 
-**7. Board evaluation**
+##### 7. Board evaluation
 
 with point evaluation method, we can evaluate the whole board by sum of the scores of each piece. And we know we must prevent the opponent to win while we are trying to get 5 our pieces in one row. So board evaluation scores should include the defend scores and the attack scores. We use the score of the current player minus the score of the opponent to represent the total score.
 $$
@@ -126,3 +128,9 @@ We use the Monte Carlo Tree Search as our basic algorithm. And based the alogrit
 [3] JINXING XIE and JIEFANG DONG,Heuristic Genetic Algorithms for General Capacitated Lot-Sizing Problems,2001
 
 [4] Louis Victor Allis,Searching for Solutions in Games and Articial Intelligence,Version 8.0 of July 1, 1994
+
+[5] Silver D, Schrittwieser J, Simonyan K, et al. Mastering the game of go without human knowledge[J]. Nature, 2017, 550(7676): 354.
+
+[6] Silver D, Hubert T, Schrittwieser J, et al. Mastering chess and shogi by self-play with a general reinforcement learning algorithm[J]. arXiv preprint arXiv:1712.01815, 2017.
+
+[7] Junxiao Song, Alpha Zero: Learning Gobang from Zero, https://zhuanlan.zhihu.com/p/32089487.
