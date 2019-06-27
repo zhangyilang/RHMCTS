@@ -239,6 +239,7 @@ class RHMCTSPlayer(object):
 
 
 def get_action_fast_version(board):
+	# A simplified version to satisfy the time limit, do directed simulations by find_kill in limited depth.
     time_limit = time.time() + 5
     action = heuristic1(board, 1)
     if action is not None:
