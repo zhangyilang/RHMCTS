@@ -4,7 +4,7 @@
 
 Final project of FDU DATA130008, AI (artificial intelligence) in 2019 spring semester.
 
-Group members: 张奕朗, 谢炳辉.
+Group members: Yilang Zhang, Binghui Xie.
 
 RHMCTS : Restricted Heuristic Monte Carlo Tree Search.
 
@@ -47,7 +47,7 @@ If the state satisfies some specific heuristic knowledge, which would leads to w
 - Heuristic 4: If our opponent have 3 pieces in the central 4 grids (the rest one is empty) of a continous 6 grids whose two heads are empty, we’ll put our piece in the center or on the head to block him. But which of the actions to take here is determined by the scores of actions (we select one action to block with probabilities in proportion to their scores which are get by our board evaluation function).
 - Heuristic 5: If there is “double 3”, make it or block your opponent to become “double 4” (see details in figure above and in our codes).
 - Heuristic 6: If there is “one 3 and one 2”, make it or block your opponent to become “one 4 and one 3”.
-- Heuristic 6: If there is “double 2”, make it or block your opponent to become “double 3”.
+- Heuristic 7: If there is “double 2”, make it or block your opponent to become “double 3”.
 
 
 
